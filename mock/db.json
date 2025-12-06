@@ -1,0 +1,111 @@
+{
+  "users": [
+    {
+      "id": "9685",
+      "fullName": "Nainshree ",
+      "email": "vnainshri1505@gmail.com",
+      "mobileNumber": "9201958752",
+      "password": "89439884384",
+      "role": "Student"
+    },
+    {
+      "id": "60cd",
+      "fullName": "Nainshree Verma",
+      "email": "vnainshri1505@gmail.com",
+      "mobileNumber": "9201958752",
+      "password": "8888888",
+      "role": "student"
+    },
+    {
+      "id": "33ce",
+      "fullName": "Nainshree Verma",
+      "email": "vnainshri1505@gmail.com",
+      "mobileNumber": "9201958752",
+      "password": "naina@15",
+      "role": "student"
+    },
+    {
+      "id": "c9fa",
+      "fullName": "Nainshree Verma",
+      "email": "vnainshri1505@gmail.com",
+      "mobileNumber": "9201958752",
+      "password": "naina@15",
+      "role": "student"
+    },
+    {
+      "id": "b375",
+      "fullName": "Nainshree Verma",
+      "email": "vnainshri1505@gmail.com",
+      "mobileNumber": "9201958752",
+      "password": "naina@15",
+      "role": "student"
+    }
+  ],
+  "students": [
+    {
+      "id": "4b48",
+      "userId": "60cd",
+      "fullName": "Nainshree Verma",
+      "email": "vnainshri1505@gmail.com",
+      "mobileNumber": "9201958752"
+    },
+    {
+      "id": "fe18",
+      "userId": "33ce",
+      "fullName": "Nainshree Verma",
+      "email": "vnainshri1505@gmail.com",
+      "mobileNumber": "9201958752"
+    },
+    {
+      "id": "751c",
+      "userId": "c9fa",
+      "fullName": "Nainshree Verma",
+      "email": "vnainshri1505@gmail.com",
+      "mobileNumber": "9201958752"
+    },
+    {
+      "id": "055a",
+      "userId": "b375",
+      "fullName": "Nainshree Verma",
+      "email": "vnainshri1505@gmail.com",
+      "mobileNumber": "9201958752"
+    },
+    {
+      "id": "2cc0",
+      "email": "vnainshri1505@gmail.com",
+      "fullName": "Nainshree Verma",
+      "age": 15,
+      "gender": "female",
+      "institute": "gfccccg",
+      "interests": [
+        "Teaching"
+      ]
+    },
+    {
+      "id": "9ef2",
+      "email": "vnainshri1505@gmail.com",
+      "fullName": "Nainshree Verma",
+      "age": 15,
+      "gender": "female",
+      "institute": "dfsfdsd",
+      "interests": [
+        "NGO Field Work",
+        "Teaching"
+      ]
+    },
+    {
+      "id": "5323",
+      "email": "vnainshri1505@gmail.com",
+      "fullName": "Nainshree Verma",
+      "age": 21,
+      "gender": "female",
+      "institute": "dfd",
+      "interests": [
+        "Teaching"
+      ]
+    }
+  ],
+  "organizations": [],
+  "internships": [],
+  "applications": []
+}

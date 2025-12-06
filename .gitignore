@@ -1,0 +1,42 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Next.js build
+.next/
+out/
+dist/
+
+# Turbo / Build system
+.turbo/
+.turbopack/
+
+# Logs
+*.log
+logs/
+*.pid
+*.seed
+*.pid.lock
+
+# Environment
+.env
+.env.*.local
+.env.local
+.env.production
+.env.development
+.env.test
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor junk
+.vscode/
+.idea/
+*.swp
+
+# Temporary
+tmp/
+temp/
