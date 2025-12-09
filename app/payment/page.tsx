@@ -14,7 +14,6 @@ export default function PaymentPage() {
           ← Back
         </Link>
         <div className="text-2xl font-bold">Solidarity</div>
-        <div></div>
       </div>
 
       {/* Main content */}
