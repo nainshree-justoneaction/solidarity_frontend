@@ -1,66 +1,46 @@
 // lib/api.ts
-// PURE FRONTEND MOCK BACKEND (NO SERVER REQUIRED)
+// Fully working multi-role mock backend
 
-let USERS: any[] = [];      // in-memory
-let STUDENTS: any[] = [];   // in-memory
+let USERS: any[] = [];
+let PROFILES: Record<string, any[]> = {
+  student: [],
+  faculty: [],
+  admin: [],
+};
 
-// Helper to persist data to sessionStorage (browser only)
 const persistData = () => {
   if (typeof window !== "undefined") {
     sessionStorage.setItem("USERS", JSON.stringify(USERS));
-    sessionStorage.setItem("STUDENTS", JSON.stringify(STUDENTS));
+    sessionStorage.setItem("PROFILES", JSON.stringify(PROFILES));
   }
 };
 
-// Load data from sessionStorage (browser only)
 const loadData = () => {
   if (typeof window !== "undefined") {
     USERS = JSON.parse(sessionStorage.getItem("USERS") || "[]");
-    STUDENTS = JSON.parse(sessionStorage.getItem("STUDENTS") || "[]");
+    PROFILES = JSON.parse(sessionStorage.getItem("PROFILES") || '{"student":[],"faculty":[],"admin":[]}');
   }
 };
 
-// ------------------------------------------
-// SIGNUP
-// ------------------------------------------
-
 export async function signup(payload: any) {
-  loadData(); // make sure we have latest data
+  loadData();
 
-  const exists = USERS.find(u => u.email.toLowerCase() === payload.email.toLowerCase());
-  if (exists) throw new Error("User already exists");
+  if (USERS.find(u => u.email.toLowerCase() === payload.email.toLowerCase())) {
+    throw new Error("User already exists");
+  }
 
   const newUser = { id: Date.now(), ...payload };
   USERS.push(newUser);
 
-  if (payload.role === "student") {
-    STUDENTS.push({
-      id: newUser.id,
-      userId: newUser.id,
-      email: payload.email,
-      fullName: payload.fullName,
-      mobileNumber: payload.mobileNumber,
-      age: null,
-      gender: null,
-      institute: null,
-      address: null,
-      pincode: null,
-      city: null,
-      interests: [],
-    });
-  }
+  if (!PROFILES[payload.role]) PROFILES[payload.role] = [];
+  PROFILES[payload.role].push({ userId: newUser.id, ...payload });
 
   persistData();
   return newUser;
 }
 
-// ------------------------------------------
-// LOGIN
-// ------------------------------------------
-
 export async function loginRequest(email: string, password: string) {
   loadData();
-
   const user = USERS.find(u => u.email.toLowerCase() === email.toLowerCase());
   if (!user) throw new Error("User not found");
   if (user.password !== password) throw new Error("Invalid password");
@@ -68,27 +48,26 @@ export async function loginRequest(email: string, password: string) {
   return { user, token: "mock-token" };
 }
 
-// ------------------------------------------
-// GET STUDENT BY USER ID
-// ------------------------------------------
-
-export async function getStudentByUserId(userId: number) {
+export async function getProfileByRole(role: string, userId: number) {
   loadData();
-  return STUDENTS.find(s => s.userId === userId);
+  const profile = PROFILES[role]?.find(p => p.userId === userId);
+  if (!profile) throw new Error(`${role} profile not found`);
+  return profile;
 }
 
-// ------------------------------------------
-// UPDATE STUDENT PROFILE (STEP FLOW)
-// ------------------------------------------
-
-export async function updateStudentProfile(userId: number, data: any) {
+export async function updateProfileByRole(userId: number, data: any) {
   loadData();
+  const role = data.role;
+  if (!PROFILES[role]) PROFILES[role] = [];
+  let profile = PROFILES[role].find(p => p.userId === userId);
 
-  const student = STUDENTS.find(s => s.userId === userId);
-  if (!student) throw new Error("Student not found");
+  if (!profile) {
+    profile = { userId, ...data };
+    PROFILES[role].push(profile);
+  } else {
+    Object.assign(profile, data);
+  }
 
-  Object.assign(student, data);
   persistData();
-
-  return student;
+  return profile;
 }

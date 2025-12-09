@@ -1,5 +1,7 @@
 "use client"
 
+import DashboardSidebar from "@/components/dashboard/sidebar"
+import DashboardHeader from "@/components/dashboard/header"
 import TrainingModules from "@/components/dashboard/training-modules"
 import SocialInternships from "@/components/dashboard/social-internships"
 import ProgressOverview from "@/components/dashboard/progress-overview"

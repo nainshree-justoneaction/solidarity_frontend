@@ -34,7 +34,7 @@ export default function LoginPage() {
 
       toast.dismiss(toastId);
       toast.success("Welcome back!");
-      router.push("/dashboard");
+      router.push(`/${role}/dashboard`);
     } catch (err: any) {
       toast.dismiss(toastId);
       toast.error(err?.message || "Login failed");
