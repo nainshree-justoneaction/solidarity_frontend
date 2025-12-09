@@ -1,0 +1,101 @@
+export const mockNGOs = [
+    {
+      id: 1,
+      name: "GreenEarth Initiative",
+      logo: "🌍",
+      domains: [3, 13, 15],
+      description: "Environmental conservation and sustainable development",
+      status: "Connected",
+    },
+    {
+      id: 2,
+      name: "Health for All",
+      logo: "🏥",
+      domains: [3, 6],
+      description: "Healthcare accessibility and wellness programs",
+      status: "Connected",
+    },
+    {
+      id: 3,
+      name: "Education First",
+      logo: "📚",
+      domains: [4, 1],
+      description: "Quality education and skill development",
+      status: "Pending",
+    },
+    {
+      id: 4,
+      name: "Women Empowerment Hub",
+      logo: "👩‍💼",
+      domains: [5, 1],
+      description: "Women entrepreneurship and leadership",
+      status: "Connected",
+    },
+  ]
+  
+  export const mockInternships = [
+    {
+      id: 1,
+      title: "Community Service Initiative",
+      organization: "GreenEarth Initiative",
+      logo: "🌍",
+      icon: "🤝",
+      description: "Work with local communities on social impact projects",
+      duration: "3 months",
+      mode: "Hybrid",
+      seats: 5,
+      sdg: 3,
+    },
+    {
+      id: 2,
+      title: "Hunger Relief Program",
+      organization: "Health for All",
+      logo: "🏥",
+      icon: "🍗",
+      description: "Support food security and nutrition initiatives",
+      duration: "2 months",
+      mode: "On-site",
+      seats: 3,
+      sdg: 2,
+    },
+    {
+      id: 3,
+      title: "Education Outreach",
+      organization: "Education First",
+      logo: "📚",
+      icon: "📖",
+      description: "Mentor students and improve educational access",
+      duration: "4 months",
+      mode: "Remote",
+      seats: 8,
+      sdg: 4,
+    },
+  ]
+  
+  export const mockTrainingModules = [
+    { id: 1, icon: "🤝", title: "Social Training", progress: 65, color: "#E5243B" },
+    { id: 2, icon: "❤️", title: "Health Awareness", progress: 45, color: "#26BDE2" },
+    { id: 3, icon: "📚", title: "Quality Education", progress: 80, color: "#C5192D" },
+    { id: 4, icon: "⚖️", title: "Gender Equality", progress: 55, color: "#FF3A21" },
+  ]
+  
+  export const sdgColors: Record<number, string> = {
+    1: "#E5243B",
+    2: "#DDA63A",
+    3: "#4C9F38",
+    4: "#C5192D",
+    5: "#FF3A21",
+    6: "#26BDE2",
+    7: "#FCC30B",
+    8: "#A21942",
+    9: "#FD6925",
+    10: "#DD1367",
+    11: "#FD9D24",
+    12: "#BF8B2E",
+    13: "#3F7E44",
+    14: "#0A97D9",
+    15: "#56C02B",
+    16: "#00689D",
+    17: "#19486A",
+  }
+  
