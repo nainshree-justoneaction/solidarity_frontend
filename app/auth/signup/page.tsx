@@ -21,19 +21,15 @@ export default function SignupPage() {
     { id: "institute", label: "Institute", desc: "Manage students", color: "#FFC30B" },
     { id: "ngo", label: "NGO", desc: "Post opportunities", color: "#27AE60" },
   ];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!fullName.trim()) return toast.error("Full name is required");
     if (!email.includes("@")) return toast.error("Enter a valid email");
-    if (phone.trim().length !== 10 || !/^\d+$/.test(phone))
-      return toast.error("Phone must be exactly 10 digits");
-
+    if (phone.length !== 10) return toast.error("Phone must be 10 digits");
     if (!password.trim()) return toast.error("Password is required");
-    if (password.length < 6)
-      return toast.error("Password must be at least 6 characters");
-
-    if (!role) return toast.error("Please select a role");
+    if (password.length < 6) return toast.error("Password must be at least 6 characters");
 
     setLoading(true);
 
@@ -49,18 +45,14 @@ export default function SignupPage() {
       sessionStorage.setItem(
         "auth",
         JSON.stringify({
-          userId: newUser.id,
+          userId: newUser.id,  
           email,
           fullName,
           role,
         })
       );
-
       toast.success("Account created!");
-
-      // 🔥 Correct redirect based on role
-      router.push(`/registration/${role}/step1`);
-
+      router.push("/registration/registration-step1"); 
     } catch (err: any) {
       toast.error(err.message || "Something went wrong");
     } finally {

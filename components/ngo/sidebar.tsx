@@ -2,15 +2,15 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { LogOut, Menu, X } from "lucide-react"
 
 const menuItems = [
-  { name: "Dashboard", href: "/ngo/dashboard" },
-  { name: "Posted Internships", href: "/ngo/internships" },
-  { name: "Applications", href: "/ngo/internships/applicants" },
-  { name: "Students Assigned", href: "/ngo/internships/assigned" },
-  { name: "Reports", href: "/ngo/reports" },
-  { name: "Donations", href: "/ngo/donations" },
-  { name: "Profile", href: "/ngo/profile" },
+  { name: "Dashboard", icon: "📊", href: "#" },
+  { name: "Posted Internships", icon: "🎯", href: "#" },
+  { name: "Applications", icon: "📋", href: "#" },
+  { name: "Students Assigned", icon: "👥", href: "#" },
+  { name: "Reports", icon: "📈", href: "#" },
+  { name: "Profile", icon: "👤", href: "#" },
 ]
 
 const sdgLabels = [
@@ -32,7 +32,7 @@ export default function NGOSidebar() {
       4: "bg-[#c5192d]",
       13: "bg-[#407f3d]",
     }
-    return colors[sdg] || "bg-zinc-500"
+    return colors[sdg] || "bg-muted"
   }
 
   return (
@@ -40,21 +40,21 @@ export default function NGOSidebar() {
       {/* Mobile Toggle */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-4 right-4 z-50 md:hidden p-3 rounded-full bg-white/10 hover:bg-white/20 transition"
+        className="fixed bottom-4 right-4 z-50 md:hidden p-2 border border-white/10 rounded hover:bg-white/5"
       >
-        <span className="text-white font-bold text-lg">{isOpen ? "X" : "☰"}</span>
+        {isOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
 
       {/* Sidebar */}
       <aside
-        className={`fixed md:relative w-64 h-screen bg-[#0B0B0B] p-6 flex flex-col transition-transform duration-300 ${
+        className={`fixed md:relative w-64 h-screen bg-black border-r border-white/10 p-6 flex flex-col transition-transform duration-300 ${
           isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         } z-40`}
       >
         {/* Logo */}
         <div className="mb-12">
           <h1 className="text-2xl font-bold text-white">Solidarity</h1>
-          <p className="text-zinc-400 text-sm">NGO Admin</p>
+          <p className="text-secondary text-sm">NGO Admin</p>
         </div>
 
         {/* Menu Items */}
@@ -63,29 +63,31 @@ export default function NGOSidebar() {
             <Link
               key={item.name}
               href={item.href}
-              className="block px-4 py-3 rounded-md text-white hover:bg-white/5 transition-colors font-medium"
+              className="flex items-center gap-3 px-4 py-3 text-foreground hover:bg-white/5 rounded transition-colors border border-transparent hover:border-white/10"
             >
-              {item.name}
+              <span className="text-lg">{item.icon}</span>
+              <span className="font-medium">{item.name}</span>
             </Link>
           ))}
         </nav>
 
-        {/* SDG Labels */}
+        {/* SDG Labels Section */}
         <div className="border-t border-white/10 pt-6 mb-8">
-          <p className="text-xs text-zinc-400 uppercase tracking-wider mb-4">SDG Categories</p>
+          <p className="text-xs text-secondary uppercase tracking-wider mb-4">SDG Categories</p>
           <div className="space-y-2">
             {sdgLabels.map((label) => (
               <div key={label.sdg} className="flex items-center gap-2 px-2">
                 <div className={`w-3 h-3 rounded-full ${getSdgColor(label.sdg)}`} />
-                <span className="text-xs text-zinc-400">{label.name}</span>
+                <span className="text-xs text-secondary">{label.name}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* Logout */}
-        <button className="w-full px-4 py-3 rounded-md text-white hover:bg-white/5 transition font-medium">
-          Logout
+        <button className="flex items-center gap-3 px-4 py-3 text-foreground hover:bg-white/5 rounded transition-colors border border-transparent hover:border-white/10 w-full">
+          <LogOut size={18} />
+          <span className="font-medium">Logout</span>
         </button>
       </aside>
     </>

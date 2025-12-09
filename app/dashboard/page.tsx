@@ -1,9 +1,9 @@
 "use client"
 
-import TrainingModules from "@/components/student/training-modules"
-import SocialInternships from "@/components/student/social-internships"
-import ProgressOverview from "@/components/student/progress-overview"
-import Certificates from "@/components/student/certificates"
+import TrainingModules from "@/components/dashboard/training-modules"
+import SocialInternships from "@/components/dashboard/social-internships"
+import ProgressOverview from "@/components/dashboard/progress-overview"
+import Certificates from "@/components/dashboard/certificates"
 
 export default function DashboardPage() {
   return (
