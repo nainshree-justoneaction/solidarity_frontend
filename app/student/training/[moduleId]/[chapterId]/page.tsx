@@ -1,62 +1,70 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { modulesData } from "@/context/AuthContext";
 
 export default function ChapterPage() {
-  const params = useParams()
-  const router = useRouter()
-  const [videoFinished, setVideoFinished] = useState(false)
+  const params = useParams();
+  const router = useRouter();
+  const [videoFinished, setVideoFinished] = useState(false);
+  const [chapterTitle, setChapterTitle] = useState("");
 
-  // Mock video content
-  const videoUrl = "https://www.w3schools.com/html/mov_bbb.mp4" // replace with real video
+  const { moduleId, chapterId } = params;
+
+  // Get chapter title dynamically from modulesData
+  useEffect(() => {
+    const mod = modulesData.find((m) => m.id === moduleId);
+    if (mod) {
+      const ch = mod.chapters.find((c) => c.id.toString() === chapterId);
+      if (ch) setChapterTitle(ch.title);
+    }
+  }, [moduleId, chapterId]);
 
   // Load saved progress
   useEffect(() => {
-    const key = `module-${params.moduleId}`
-    const savedProgress = JSON.parse(localStorage.getItem(key) || "{}")
-    if (savedProgress[params.chapterId]) {
-      setVideoFinished(true)
-    }
-  }, [params.moduleId, params.chapterId])
+    const key = `module-${moduleId}`;
+    const savedProgress = JSON.parse(localStorage.getItem(key) || "{}");
+    if (savedProgress[chapterId]) setVideoFinished(true);
+  }, [moduleId, chapterId]);
 
   const handleVideoComplete = () => {
-    const key = `module-${params.moduleId}`
-    const savedProgress = JSON.parse(localStorage.getItem(key) || "{}")
-    savedProgress[params.chapterId] = true
-    localStorage.setItem(key, JSON.stringify(savedProgress))
-    setVideoFinished(true)
+    const key = `module-${moduleId}`;
+    const savedProgress = JSON.parse(localStorage.getItem(key) || "{}");
+    savedProgress[chapterId] = true;
+    localStorage.setItem(key, JSON.stringify(savedProgress));
+    setVideoFinished(true);
 
-    // Redirect back to module page after short delay
+    // Short delay before redirect
     setTimeout(() => {
-      router.push(`/dashboard/training/${params.moduleId}`)
-    }, 1000)
-  }
+      router.push(`/student/training/${moduleId}`);
+    }, 1200);
+  };
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-white mb-4">Chapter {params.chapterId}</h1>
+      <h1 className="text-3xl font-bold text-white mb-4">
+        {chapterTitle || `Chapter ${chapterId}`}
+      </h1>
 
       <div className="bg-white/5 rounded-2xl p-6">
         <video
-          src={videoUrl}
+          src="https://www.w3schools.com/html/mov_bbb.mp4" // replace with real video
           controls
           className="w-full rounded-lg"
           onEnded={handleVideoComplete}
         />
 
-        {!videoFinished && (
+        {!videoFinished ? (
           <p className="text-white/60 mt-2">
-            Watch the video fully to mark chapter as complete.
+            Watch the full video to mark chapter as complete.
           </p>
-        )}
-
-        {videoFinished && (
-          <p className="text-green-400 mt-2 font-semibold">
+        ) : (
+          <p className="text-green-400 mt-2 font-semibold animate-pulse">
             ✅ Chapter completed! Redirecting...
           </p>
         )}
       </div>
     </div>
-  )
+  );
 }

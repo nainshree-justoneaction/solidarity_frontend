@@ -21,20 +21,21 @@ export default function LoginPage() {
       // lowercase email to match mock backend
       const resp = await loginRequest(data.email.toLowerCase(), data.password);
 
-      // store auth for next pages
-      sessionStorage.setItem(
-        "auth",
-        JSON.stringify({
-          userId: resp.user.id,
-          email: resp.user.email,
-          fullName: resp.user.fullName,
-          token: resp.token,
-        })
-      );
+      // store auth including role
+      const authData = {
+        userId: resp.user.id,
+        email: resp.user.email,
+        fullName: resp.user.fullName,
+        role: resp.user.role || "student", // fallback
+        token: resp.token,
+      };
+      sessionStorage.setItem("auth", JSON.stringify(authData));
 
       toast.dismiss(toastId);
-      toast.success("Welcome back!");
-      router.push(`/${role}/dashboard`);
+      toast.success(`Welcome back, ${authData.fullName}!`);
+
+      // navigate to role-based dashboard
+      router.push(`/${authData.role}/dashboard`);
     } catch (err: any) {
       toast.dismiss(toastId);
       toast.error(err?.message || "Login failed");
