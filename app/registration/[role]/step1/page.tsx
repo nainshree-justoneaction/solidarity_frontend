@@ -48,25 +48,43 @@ export default function Step1() {
     try {
       for (const field of fields) {
         const value = data[field.name];
-        if (!value || value.toString().trim() === "") return toast.error(`${field.label} is required`);
-        if ((field.type === "text" || field.type === "email" || field.type === "password") && field.min && value.toString().length < field.min) {
+
+        if (field.required && (!value || value.toString().trim() === "")) {
+          return toast.error(`${field.label} is required`);
+        }
+
+        if (["text", "email"].includes(field.type) && field.min && value.length < field.min) {
           return toast.error(`${field.label} must be at least ${field.min} characters`);
         }
+
         if (field.type === "number") {
-          const numValue = Number(value);
-          if (isNaN(numValue)) return toast.error(`${field.label} must be a valid number`);
-          if (field.min && numValue < field.min) return toast.error(`${field.label} must be at least ${field.min}`);
-          if (field.max && numValue > field.max) return toast.error(`${field.label} must be less than or equal to ${field.max}`);
+          const num = Number(value);
+          if (isNaN(num)) return toast.error(`${field.label} must be a valid number`);
+          if (field.min && num < field.min) return toast.error(`${field.label} must be at least ${field.min}`);
+          if (field.max && num > field.max) return toast.error(`${field.label} must be <= ${field.max}`);
         }
       }
-
-      await updateProfileByRole(auth.userId!, { role, ...data });
+      const prevSteps = JSON.parse(sessionStorage.getItem("registration") || "{}");
+      const merged = {
+        ...prevSteps,
+        step1: data,
+      };
+      sessionStorage.setItem("registration", JSON.stringify(merged));
+      const payload = {
+        userId: auth.userId,
+        role,
+        email: auth.email,         // important
+        fullName: auth.fullName,   // important
+        ...data,
+      };
+      await updateProfileByRole(auth.userId!, payload);
       toast.success("Step 1 completed!");
-    router.push(`/registration/${role}/step2`);
+      router.push(`/registration/${role}/step2`);
     } catch (err: any) {
       toast.error(err?.message || "Save failed");
     }
   };
+
 
   return (
     <div className="min-h-screen bg-black text-white px-6 py-12 flex items-start justify-center">

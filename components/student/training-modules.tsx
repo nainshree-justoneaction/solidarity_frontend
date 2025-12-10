@@ -20,7 +20,7 @@ const modules: Module[] = [
     progress: 65,
     icon: <Award size={24} />,
     sdgColor: "#e5243b",
-    href: "/dashboard/training/social-training",
+    href: "/student/training/social-training",
   },
   {
     id: "2",
@@ -28,7 +28,7 @@ const modules: Module[] = [
     progress: 45,
     icon: <Heart size={24} />,
     sdgColor: "#4c9f38",
-    href: "/dashboard/training/health-awareness",
+    href: "/student/training/health-awareness",
   },
   {
     id: "3",
@@ -36,7 +36,7 @@ const modules: Module[] = [
     progress: 80,
     icon: <BookOpen size={24} />,
     sdgColor: "#c5192d",
-    href: "/dashboard/training/quality-education",
+    href: "/student/training/quality-education",
   },
   {
     id: "4",
@@ -44,7 +44,7 @@ const modules: Module[] = [
     progress: 55,
     icon: <Plus size={24} />,
     sdgColor: "#dd3e39",
-    href: "/dashboard/training/gender-equality",
+    href: "/student/training/gender-equality",
   },
 ]
 

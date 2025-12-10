@@ -1,6 +1,25 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
 export default function PaymentSuccess() {
+  const router = useRouter();
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    const registration = JSON.parse(sessionStorage.getItem("registration") || "{}");
+    setRole(registration.role || null);
+  }, []);
+
+  const handleGoDashboard = () => {
+    if (role) {
+      router.push(`/${role}/dashboard`);
+    } else {
+      router.push("/auth/login"); 
+    }
+  };
+
   return (
     <div style={styles.wrapper}>
       <div style={styles.card}>
@@ -14,7 +33,7 @@ export default function PaymentSuccess() {
           training programs, and resources.
         </p>
 
-        <button style={styles.button} onClick={() => window.location.href = "/dashboard"}>
+        <button style={styles.button} onClick={handleGoDashboard}>
           Go to Dashboard
         </button>
       </div>

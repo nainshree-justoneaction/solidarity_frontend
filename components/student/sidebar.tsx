@@ -24,13 +24,13 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
-  { label: "Dashboard", icon: <Home size={20} />, href: "/dashboard" },
-  { label: "Profile", icon: <User size={20} />, href: "/dashboard/profile" },
-  { label: "Your Internships", icon: <Briefcase size={20} />, href: "/dashboard/internships" },
-  { label: "Training Modules", icon: <BookOpen size={20} />, href: "/dashboard/training", sdgColor: "#c5192d" },
-  { label: "Reports", icon: <BarChart3 size={20} />, href: "/dashboard/reports" },
-  { label: "Certificates", icon: <Award size={20} />, href: "/dashboard/certificates" },
-  { label: "Notifications", icon: <Bell size={20} />, href: "/dashboard/notifications" },
+  { label: "Dashboard", icon: <Home size={20} />, href: "/student/dashboard" },
+  { label: "Profile", icon: <User size={20} />, href: "/student/profile" },
+  { label: "Your Internships", icon: <Briefcase size={20} />, href: "/student/internships" },
+  { label: "Training Modules", icon: <BookOpen size={20} />, href: "/student/training", sdgColor: "#c5192d" },
+  { label: "Reports", icon: <BarChart3 size={20} />, href: "/student/reports" },
+  { label: "Certificates", icon: <Award size={20} />, href: "/student/certificates" },
+  { label: "Notifications", icon: <Bell size={20} />, href: "/student/notifications" },
 ]
 
 export default function DashboardSidebar() {

@@ -12,7 +12,6 @@ export const registrationSteps = {
     step2: [
       { name: "semester", label: "Semester", type: "text", min: 1, required: true },
       { name: "skills", label: "Skills / Competencies", type: "textarea", min: 5, required: true },
-      { name: "interests", label: "Interest Areas", type: "multi-select", options: ["Education", "Environment", "Healthcare", "Community Service", "Technology"], required: true },
     ],
     step3: [
       { name: "projects", label: "Projects Interested In", type: "textarea", min: 10, required: false },

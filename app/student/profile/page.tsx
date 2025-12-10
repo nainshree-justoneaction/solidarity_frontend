@@ -1,8 +1,7 @@
-// app/dashboard/profile/page.tsx
 "use client"
 
 import { useEffect, useState } from "react"
-// import { getStudentByUserId } from "@/lib/api"
+import { getStudentByUserId } from "@/lib/api"
 import toast from "react-hot-toast"
 
 export default function ProfilePage() {
@@ -15,10 +14,10 @@ export default function ProfilePage() {
     const auth = JSON.parse(authStr)
     if (!auth.userId) return
 
-  //   getStudentByUserId(auth.userId)
-  //     .then(setStudent)
-  //     .catch((err) => toast.error(err.message || "Failed to load profile"))
-  // }, [])
+    getStudentByUserId(auth.userId)
+      .then(setStudent)
+      .catch((err) => toast.error(err.message || "Failed to load profile"))
+  }, [])
 
   if (!student) return <p className="text-white">Loading profile...</p>
 

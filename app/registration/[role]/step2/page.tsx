@@ -18,13 +18,16 @@ export default function Step2() {
 
   // Load auth
   useEffect(() => {
-    const stored = sessionStorage.getItem("auth");
-    if (!stored) return router.replace("/auth/signup");
+    if (auth === "loading") return;
 
-    const parsed = JSON.parse(stored);
-    if (!registrationSteps[role]) return router.replace(`/registration/${parsed.role}/step1`);
-    setAuth(parsed);
-  }, [role, router]);
+    const saved = JSON.parse(sessionStorage.getItem("registration") || "{}");
+
+    if (saved.step2) {
+      for (const key in saved.step2) {
+        setValue(key, saved.step2[key]);
+      }
+    }
+  }, [auth, setValue]);
 
   if (auth === "loading") return null;
 
@@ -39,6 +42,7 @@ export default function Step2() {
 
   const onSubmit = async (data: any) => {
     try {
+      // VALIDATION
       for (const field of fields) {
         const value = data[field.name];
         if (field.required && (!value || value.toString().trim() === "")) {
@@ -46,13 +50,30 @@ export default function Step2() {
         }
       }
 
-      await updateProfileByRole(auth.userId, { role, ...data });
+      const prev = JSON.parse(sessionStorage.getItem("registration") || "{}");
+      const merged = {
+        ...prev,
+        step2: data,
+      };
+      sessionStorage.setItem("registration", JSON.stringify(merged));
+      const payload = {
+        userId: auth.userId,
+        role,
+        email: auth.email,
+        fullName: auth.fullName,
+        ...(merged.step1 || {}),
+        ...(merged.step2 || {}),
+      };
+
+      await updateProfileByRole(auth.userId, payload);
+
       toast.success("Step 2 completed!");
       router.push(`/registration/${role}/step3`);
     } catch (err: any) {
       toast.error(err?.message || "Save failed");
     }
   };
+
 
   return (
     <div className="min-h-screen bg-black text-white px-6 py-12 flex items-start justify-center">

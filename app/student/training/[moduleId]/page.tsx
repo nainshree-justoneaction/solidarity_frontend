@@ -40,7 +40,7 @@ export default function ModuleOverviewPage() {
   useEffect(() => {
     const access = localStorage.getItem("solidarity_paid")
     if (access !== "true") {
-      router.replace("/dashboard/payment")
+      router.replace("/student/payment")
     }
   }, [])
 
