@@ -1,9 +1,21 @@
 "use client";
 import Link from "next/link";
 import { useAuth, modulesData } from "@/context/AuthContext";
+import { useEffect, useState } from "react";
 
 export default function TrainingModulesPage() {
   const { fullName } = useAuth();
+  const [progressMap, setProgressMap] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    const map: Record<string, number> = {};
+    modulesData.forEach(mod => {
+      const savedProgress = JSON.parse(localStorage.getItem(`module-${mod.id}`) || "{}");
+      const completedCount = Object.values(savedProgress).filter(Boolean).length;
+      map[mod.id] = Math.round((completedCount / mod.chapters.length) * 100);
+    });
+    setProgressMap(map);
+  }, []);
 
   return (
     <section className="animate-fade-in">
@@ -13,10 +25,8 @@ export default function TrainingModulesPage() {
       <h2 className="text-xl font-semibold text-white mb-6">Training Modules</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {modulesData.map((mod, index) => {
-          const savedProgress = JSON.parse(localStorage.getItem(`module-${mod.id}`) || "{}");
-          const completedCount = Object.values(savedProgress).filter(Boolean).length;
-          const progress = Math.round((completedCount / mod.chapters.length) * 100);
+        {modulesData.map((mod) => {
+          const progress = progressMap[mod.id] ?? 0;
 
           return (
             <Link
