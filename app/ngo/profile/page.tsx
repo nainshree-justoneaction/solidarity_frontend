@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 export default function ProfilePage() {
   const [profile, setProfile] = React.useState(JSON.parse(localStorage.getItem("ngoProfile") || '{"name":"GreenWave Trust","reg":"AA12345","location":"Indore"}'));
   function save() { localStorage.setItem("ngoProfile", JSON.stringify(profile)); alert("Saved locally"); }
