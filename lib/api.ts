@@ -1,31 +1,42 @@
 // lib/api.ts
 
 // ------------------------
+// Allowed roles
+// ------------------------
+const ALLOWED_ROLES = ["student", "faculty", "institute", "ngo", "admin"];
+
+// ------------------------
 // In-memory store
 // ------------------------
 let USERS: any[] = [];
 let PROFILES: Record<string, any[]> = {
   student: [],
   faculty: [],
+  institute: [],
+  ngo: [],
   admin: [],
 };
 
 // ------------------------
-// Initialize sessionStorage if empty
+// Initialize session data
 // ------------------------
 const initData = () => {
   if (typeof window === "undefined") return;
 
-  // Ensure USERS exists
   if (!sessionStorage.getItem("USERS")) {
     sessionStorage.setItem("USERS", JSON.stringify([]));
   }
 
-  // Ensure PROFILES exists
   if (!sessionStorage.getItem("PROFILES")) {
     sessionStorage.setItem(
       "PROFILES",
-      JSON.stringify({ student: [], faculty: [], admin: [] })
+      JSON.stringify({
+        student: [],
+        faculty: [],
+        institute: [],
+        ngo: [],
+        admin: [],
+      })
     );
   }
 
@@ -47,15 +58,27 @@ const loadData = () => {
   try {
     PROFILES = JSON.parse(
       sessionStorage.getItem("PROFILES") ||
-        JSON.stringify({ student: [], faculty: [], admin: [] })
+        JSON.stringify({
+          student: [],
+          faculty: [],
+          institute: [],
+          ngo: [],
+          admin: [],
+        })
     );
   } catch {
-    PROFILES = { student: [], faculty: [], admin: [] };
+    PROFILES = {
+      student: [],
+      faculty: [],
+      institute: [],
+      ngo: [],
+      admin: [],
+    };
   }
 };
 
 // ------------------------
-// Persist to sessionStorage
+// Persist back to sessionStorage
 // ------------------------
 const persistData = () => {
   if (typeof window === "undefined") return;
@@ -72,22 +95,30 @@ export async function signup(payload: any) {
 
   if (!payload.role) throw new Error("Role is required");
 
-  // normalize role
   const role = payload.role.toLowerCase();
-  if (!["student", "faculty", "admin"].includes(role)) {
+
+  if (!ALLOWED_ROLES.includes(role)) {
     throw new Error("Invalid role");
   }
 
-  // check duplicate email
-  if (USERS.find(u => u.email.toLowerCase() === payload.email.toLowerCase())) {
+  // Prevent duplicate email
+  if (USERS.some(u => u.email.toLowerCase() === payload.email.toLowerCase())) {
     throw new Error("User already exists");
   }
 
-  const newUser = { id: Date.now(), ...payload, role };
+  const newUser = {
+    id: Date.now(),
+    ...payload,
+    role,
+  };
+
   USERS.push(newUser);
 
-  if (!PROFILES[role]) PROFILES[role] = [];
-  PROFILES[role].push({ userId: newUser.id, ...payload, role });
+  PROFILES[role].push({
+    userId: newUser.id,
+    ...payload,
+    role,
+  });
 
   persistData();
   return newUser;
@@ -99,18 +130,20 @@ export async function signup(payload: any) {
 export async function loginRequest(email: string, password: string) {
   initData();
 
-  const user = USERS.find(u => u.email.toLowerCase() === email.toLowerCase());
+  const user = USERS.find(
+    u => u.email.toLowerCase() === email.toLowerCase()
+  );
+
   if (!user) throw new Error("User not found");
   if (user.password !== password) throw new Error("Invalid password");
 
-  // Save auth info with role
   if (typeof window !== "undefined") {
     sessionStorage.setItem(
       "auth",
       JSON.stringify({
         fullName: user.fullName,
         email: user.email,
-        role: user.role || "student", // fallback
+        role: user.role,
         userId: user.id,
       })
     );
@@ -120,23 +153,23 @@ export async function loginRequest(email: string, password: string) {
 }
 
 // ------------------------
-// GET PROFILE BY ROLE
+// GET PROFILE
 // ------------------------
 export async function getProfileByRole(userId: number, role?: string) {
   initData();
 
-  let userRole = role?.toLowerCase();
+  let r = role?.toLowerCase();
 
-  if (!userRole) {
-    // fallback: find role from PROFILES
-    userRole = Object.keys(PROFILES).find(r =>
-      PROFILES[r].some(p => p.userId === userId)
+  if (!r) {
+    r = ALLOWED_ROLES.find(roleName =>
+      PROFILES[roleName].some(p => p.userId === userId)
     );
-    if (!userRole) throw new Error("Role not found for this user");
   }
 
-  const profile = PROFILES[userRole]?.find(p => p.userId === userId);
-  if (!profile) throw new Error(`${userRole} profile not found`);
+  if (!r) throw new Error("Role not found for this user");
+
+  const profile = PROFILES[r].find(p => p.userId === userId);
+  if (!profile) throw new Error(`${r} profile not found`);
 
   return profile;
 }
@@ -150,15 +183,15 @@ export async function updateProfileByRole(userId: number, data: any) {
   let role = data.role?.toLowerCase();
 
   if (!role) {
-    role = Object.keys(PROFILES).find(r =>
+    role = ALLOWED_ROLES.find(r =>
       PROFILES[r].some(p => p.userId === userId)
     );
-    if (!role) throw new Error("Role not found for this user");
   }
 
-  if (!PROFILES[role]) PROFILES[role] = [];
+  if (!role) throw new Error("Role not found for this user");
 
   let profile = PROFILES[role].find(p => p.userId === userId);
+
   if (!profile) {
     profile = { userId, ...data, role };
     PROFILES[role].push(profile);
@@ -171,7 +204,7 @@ export async function updateProfileByRole(userId: number, data: any) {
 }
 
 // ------------------------
-// GET CURRENT AUTH
+// AUTH GETTER & LOGOUT
 // ------------------------
 export const getAuth = () => {
   if (typeof window === "undefined") return null;
@@ -182,9 +215,6 @@ export const getAuth = () => {
   }
 };
 
-// ------------------------
-// LOGOUT
-// ------------------------
 export const logout = () => {
   if (typeof window !== "undefined") {
     sessionStorage.removeItem("auth");
