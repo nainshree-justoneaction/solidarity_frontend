@@ -1,10 +1,16 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { User } from "lucide-react"
-import { useAuth } from "@/context/AuthContext"
 
 export default function DashboardHeader() {
-  const { fullName } = useAuth()
+  const [fullName, setFullName] = useState("")
+
+  useEffect(() => {
+    const auth = JSON.parse(sessionStorage.getItem("auth") || "{}")
+    setFullName(auth.fullName || "")
+    console.log("Loaded fullName:", auth.fullName)
+  }, [])
 
   return (
     <header className="bg-black border-b border-white/10 px-8 py-6">

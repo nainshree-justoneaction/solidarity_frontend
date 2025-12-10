@@ -2,10 +2,10 @@
 import { createContext, useContext, ReactNode, useState, useEffect } from "react";
 
 interface AuthContextType {
-  fullName: string;
-  email: string;
-  role: string;
-  userId: number;
+  fullName?: string;
+  email?: string;
+  role?: string;
+  userId?: number;
   setUser: (user: Partial<AuthContextType>) => void;
 }
 
@@ -22,34 +22,26 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [user, setUserState] = useState<AuthContextType>({
-    fullName: "",
-    email: "",
-    role: "",
-    userId: 0,
-    setUser: () => {},
-  });
+  const [userData, setUserData] = useState<Partial<AuthContextType>>({});
 
   useEffect(() => {
     const stored = sessionStorage.getItem("auth");
     if (stored) {
-      const parsed = JSON.parse(stored);
-      setUserState({
-        ...parsed,
-        setUser: (partialUser: Partial<AuthContextType>) => {
-          const updated = { ...parsed, ...partialUser };
-          sessionStorage.setItem("auth", JSON.stringify(updated));
-          setUserState(updated);
-        },
-      });
-    } else {
-      setUserState((prev) => ({ ...prev, setUser: prev.setUser }));
+      setUserData(JSON.parse(stored));
     }
   }, []);
 
-  if (!user.fullName) return null; // prevent initial flash
+  const setUser = (partial: Partial<AuthContextType>) => {
+    const updated = { ...userData, ...partial };
+    sessionStorage.setItem("auth", JSON.stringify(updated));
+    setUserData(updated);
+  };
 
-  return <AuthContext.Provider value={user}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ ...userData, setUser }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 

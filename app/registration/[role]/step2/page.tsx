@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter, useParams } from "next/navigation";
 import toast from "react-hot-toast";
@@ -13,23 +13,16 @@ export default function Step2() {
   const params = useParams();
   const role = params.role as string;
 
-  const { register, handleSubmit, setValue } = useForm<any>();
-  const [auth, setAuth] = useState<any>("loading");
+  // react-hook-form
+  const { register, handleSubmit, reset } = useForm<any>({ defaultValues: {} });
 
-  // Load auth
+  // Prefill form from sessionStorage
   useEffect(() => {
-    if (auth === "loading") return;
-
     const saved = JSON.parse(sessionStorage.getItem("registration") || "{}");
-
     if (saved.step2) {
-      for (const key in saved.step2) {
-        setValue(key, saved.step2[key]);
-      }
+      reset(saved.step2); // reset fills the form
     }
-  }, [auth, setValue]);
-
-  if (auth === "loading") return null;
+  }, [reset]);
 
   const fields = registrationSteps[role]?.step2 || [];
   if (!fields) {
@@ -50,22 +43,21 @@ export default function Step2() {
         }
       }
 
+      // Save to sessionStorage
       const prev = JSON.parse(sessionStorage.getItem("registration") || "{}");
-      const merged = {
-        ...prev,
-        step2: data,
-      };
+      const merged = { ...prev, step2: data };
       sessionStorage.setItem("registration", JSON.stringify(merged));
+
+      // Build payload using step1 + step2
       const payload = {
-        userId: auth.userId,
-        role,
-        email: auth.email,
-        fullName: auth.fullName,
         ...(merged.step1 || {}),
         ...(merged.step2 || {}),
       };
 
-      await updateProfileByRole(auth.userId, payload);
+      // Update backend (no context, just sessionStorage data)
+      if (payload.userId) {
+        await updateProfileByRole(payload.userId, payload);
+      }
 
       toast.success("Step 2 completed!");
       router.push(`/registration/${role}/step3`);
@@ -74,11 +66,9 @@ export default function Step2() {
     }
   };
 
-
   return (
     <div className="min-h-screen bg-black text-white px-6 py-12 flex items-start justify-center">
       <div className="w-full max-w-6xl grid grid-cols-[240px_1fr] gap-12">
-
         <StepSidebar activeStep={2} role={role} />
 
         <div className="bg-black border border-white/10 rounded-xl p-10">

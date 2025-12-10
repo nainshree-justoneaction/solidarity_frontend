@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function PaymentSuccess() {
   const router = useRouter();
@@ -11,14 +12,27 @@ export default function PaymentSuccess() {
     const registration = JSON.parse(sessionStorage.getItem("registration") || "{}");
     setRole(registration.role || null);
   }, []);
-
   const handleGoDashboard = () => {
-    if (role) {
+    const registration = JSON.parse(sessionStorage.getItem("registration") || "{}");
+    const isPaid = localStorage.getItem("solidarity_paid") === "true";
+
+    // Try to get role from session storage user data if registration.role missing
+    const role =
+      registration.role ||
+      (registration.step1 && registration.step1.role) ||
+      "student"; // default fallback if you know role
+
+    if (isPaid && role) {
       router.push(`/${role}/dashboard`);
-    } else {
-      router.push("/auth/login"); 
+    } else if (!role) {
+      router.push("/auth/login");
+    } else if (!isPaid) {
+      router.push("/payment");
     }
   };
+
+
+
 
   return (
     <div style={styles.wrapper}>
@@ -29,7 +43,7 @@ export default function PaymentSuccess() {
 
         <h1 style={styles.title}>Payment Successful!</h1>
         <p style={styles.subtitle}>
-          Your payment has been received. You now have access to all modules, internships, 
+          Your payment has been received. You now have access to all modules, internships,
           training programs, and resources.
         </p>
 
