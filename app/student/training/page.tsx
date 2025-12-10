@@ -21,7 +21,7 @@ export default function TrainingModulesPage() {
           return (
             <Link
               key={mod.id}
-              href={`/dashboard/training/${mod.id}`}
+              href={`/student/training/${mod.id}`}
               className="bg-black border border-white/10 rounded p-6 hover:border-white/20 hover:scale-105 transition-transform transition-colors cursor-pointer"
             >
               <div

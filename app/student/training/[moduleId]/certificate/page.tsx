@@ -1,23 +1,27 @@
 "use client";
-import { useRef, useState, useEffect } from "react";
+
+import { useParams } from "next/navigation";
+import { useEffect, useState, useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useAuth } from "@/context/AuthContext";
 import { modulesData } from "@/context/AuthContext";
 
-interface CertificatePageProps {
-  moduleId: string;
-}
+export default function CertificatePage() {
+  const params = useParams();
+  const moduleId = params.moduleId; // yahi string from URL
 
-export default function CertificatePage({ moduleId }: CertificatePageProps) {
   const certRef = useRef<HTMLDivElement>(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const { fullName } = useAuth();
   const [moduleName, setModuleName] = useState("Training Module");
 
   useEffect(() => {
+    if (!moduleId || !modulesData || modulesData.length === 0) return;
+
     const mod = modulesData.find((m) => m.id === moduleId);
-    if (mod) setModuleName(mod.title);
+    console.log("Found module:", mod);
+    setModuleName(mod?.title || "Unknown Module");
   }, [moduleId]);
 
   const date = new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
@@ -60,10 +64,20 @@ export default function CertificatePage({ moduleId }: CertificatePageProps) {
       </button>
 
       <div ref={certRef} style={{ width: "1100px", background: "white", border: "1px solid #ccc", boxShadow: "0 0 20px rgba(0,0,0,0.1)", paddingBottom: "20px" }}>
+        {/* Top colored bar */}
         <div style={{ display: "flex", width: "100%", height: "20px" }}>
-          {Array.from({ length: 17 }).map((_, i) => <div key={i} style={{ flex: 1, backgroundColor: ["#E5243B","#DDA63A","#4C9F38","#C5192D","#FF3A21","#26BDE2","#FCC30B","#A21942","#FD6925","#DD1367","#FD9D24","#BF8B2E","#3F7E44","#0A97D9","#56C02B","#00689D","#19486A"][i] }} />)}
+          {Array.from({ length: 17 }).map((_, i) => (
+            <div
+              key={i}
+              style={{
+                flex: 1,
+                backgroundColor: ["#E5243B", "#DDA63A", "#4C9F38", "#C5192D", "#FF3A21", "#26BDE2", "#FCC30B", "#A21942", "#FD6925", "#DD1367", "#FD9D24", "#BF8B2E", "#3F7E44", "#0A97D9", "#56C02B", "#00689D", "#19486A"][i]
+              }}
+            />
+          ))}
         </div>
 
+        {/* Certificate body */}
         <div style={{ padding: "50px", textAlign: "center", fontFamily: "Arial, sans-serif", color: "#000" }}>
           <h1 style={{ fontSize: "60px", margin: 0, fontWeight: "bold" }}>CERTIFICATE</h1>
           <p style={{ fontSize: "28px", marginTop: "10px" }}>OF ACHIEVEMENT</p>
@@ -74,9 +88,10 @@ export default function CertificatePage({ moduleId }: CertificatePageProps) {
           <p style={{ fontSize: "28px", fontWeight: "bold", marginTop: "10px" }}>{moduleName}</p>
           <p style={{ marginTop: "50px", fontSize: "20px" }}>Date of Completion: <b>{date}</b></p>
 
+          {/* Seal & QR */}
           <div style={{ display: "flex", justifyContent: "space-around", marginTop: "40px" }}>
             <div style={{ textAlign: "center" }}>
-              <img src="/home/nainshree/solidarity-frontend /public/blue-seal.png" alt="Seal" style={{ width: "150px" }} crossOrigin="anonymous" />
+              <img src="/blue-seal.png" alt="Seal" style={{ width: "150px" }} crossOrigin="anonymous" />
               <p style={{ fontSize: "12px", marginTop: "5px" }}>Official Seal</p>
             </div>
             <div style={{ textAlign: "center" }}>
@@ -86,8 +101,17 @@ export default function CertificatePage({ moduleId }: CertificatePageProps) {
           </div>
         </div>
 
+        {/* Bottom colored bar */}
         <div style={{ display: "flex", width: "100%", height: "20px" }}>
-          {Array.from({ length: 17 }).map((_, i) => <div key={i} style={{ flex: 1, backgroundColor: ["#E5243B","#DDA63A","#4C9F38","#C5192D","#FF3A21","#26BDE2","#FCC30B","#A21942","#FD6925","#DD1367","#FD9D24","#BF8B2E","#3F7E44","#0A97D9","#56C02B","#00689D","#19486A"][i] }} />)}
+          {Array.from({ length: 17 }).map((_, i) => (
+            <div
+              key={i}
+              style={{
+                flex: 1,
+                backgroundColor: ["#E5243B", "#DDA63A", "#4C9F38", "#C5192D", "#FF3A21", "#26BDE2", "#FCC30B", "#A21942", "#FD6925", "#DD1367", "#FD9D24", "#BF8B2E", "#3F7E44", "#0A97D9", "#56C02B", "#00689D", "#19486A"][i]
+              }}
+            />
+          ))}
         </div>
       </div>
     </div>
