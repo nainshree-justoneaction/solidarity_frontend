@@ -1,10 +1,10 @@
 "use client";
-import FacultyManagement from "@/components/institute/faculty-management";
-import StudentTracking from "@/components/institute/student-tracking";
-import InternshipPrograms from "@/components/institute/internship-programs";
-import QuickStats from "@/components/institute/quick-stats";
-import Navbar from "@/components/institute/navbar";
-import Sidebar from "@/components/institute/sidebar";
+import FacultyManagement from "@/components/institute-dashboard/faculty-management";
+import StudentTracking from "@/components/institute-dashboard/student-tracking";
+import InternshipPrograms from "@/components/institute-dashboard/internship-programs";
+import QuickStats from "@/components/institute-dashboard/quick-stats";
+import Navbar from "@/components/institute-dashboard/navbar";
+import Sidebar from "@/components/institute-dashboard/sidebar";
 export default function InstituteDashboard() {
   return (
     <div className="flex bg-gray-50 min-h-screen">
