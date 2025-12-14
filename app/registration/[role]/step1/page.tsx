@@ -77,7 +77,7 @@ export default function Step1() {
         fullName: auth.fullName,   // important
         ...data,
       };
-      await updateProfileByRole(auth.userId!, payload);
+     const user = await updateProfileByRole(auth.userId!,payload);
       toast.success("Step 1 completed!");
       router.push(`/registration/${role}/step2`);
     } catch (err: any) {

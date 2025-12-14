@@ -16,14 +16,14 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
 
   const roles = [
-    { id: "student", label: "Student", desc: "Apply for internships", color: "#E5243B" },
-    { id: "faculty", label: "Faculty", desc: "Access portal", color: "#4C9F38" },
-    { id: "institute", label: "Institute", desc: "Manage students", color: "#FFC30B" },
-    { id: "ngo", label: "NGO", desc: "Post opportunities", color: "#27AE60" },
+    { id: "Student", label: "Student", desc: "Apply for internships", color: "#E5243B" },
+    { id: "Faculty", label: "Faculty", desc: "Access portal", color: "#4C9F38" },
+    { id: "Institute", label: "Institute", desc: "Manage students", color: "#FFC30B" },
+    { id: "Ngo", label: "NGO", desc: "Post opportunities", color: "#27AE60" },
   ];
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    console.log(fullName)
     if (!fullName.trim()) return toast.error("Full name is required");
     if (!email.includes("@")) return toast.error("Enter a valid email");
     if (phone.trim().length !== 10 || !/^\d+$/.test(phone))
@@ -41,20 +41,10 @@ export default function SignupPage() {
       const newUser = await signup({
         fullName,
         email,
-        mobileNumber: phone,
+        phone,
         password,
         role,
       });
-
-      sessionStorage.setItem(
-        "auth",
-        JSON.stringify({
-          userId: newUser.id,
-          email,
-          fullName,
-          role,
-        })
-      );
 
       toast.success("Account created!");
 
