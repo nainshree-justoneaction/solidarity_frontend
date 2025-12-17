@@ -90,13 +90,67 @@ const persistData = () => {
 // ------------------------
 // SIGNUP
 // ------------------------
+export async function signup(payload: any) {
+  initData();
 
+  if (!payload.role) throw new Error("Role is required");
 
+  const role = payload.role.toLowerCase();
+
+  if (!ALLOWED_ROLES.includes(role)) {
+    throw new Error("Invalid role");
+  }
+
+  // Prevent duplicate email
+  if (USERS.some(u => u.email.toLowerCase() === payload.email.toLowerCase())) {
+    throw new Error("User already exists");
+  }
+
+  const newUser = {
+    id: Date.now(),
+    ...payload,
+    role,
+  };
+
+  USERS.push(newUser);
+
+  PROFILES[role].push({
+    userId: newUser.id,
+    ...payload,
+    role,
+  });
+
+  persistData();
+  return newUser;
+}
 
 // ------------------------
 // LOGIN
 // ------------------------
+export async function loginRequest(email: string, password: string) {
+  initData();
 
+  const user = USERS.find(
+    u => u.email.toLowerCase() === email.toLowerCase()
+  );
+
+  if (!user) throw new Error("User not found");
+  if (user.password !== password) throw new Error("Invalid password");
+
+  if (typeof window !== "undefined") {
+    sessionStorage.setItem(
+      "auth",
+      JSON.stringify({
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+        userId: user.id,
+      })
+    );
+  }
+
+  return { user, token: "mock-token" };
+}
 
 // ------------------------
 // GET PROFILE
@@ -152,104 +206,6 @@ export async function updateProfileByRole(userId: number, data: any) {
 // ------------------------
 // AUTH GETTER & LOGOUT
 // ------------------------
-
-
-// lib/api.ts
-import axios from "axios";
-
-// ------------------------
-// Axios instance
-// ------------------------
-const api = axios.create({
-  baseURL: "http://localhost:5000", // change for prod
-  withCredentials: true, // allow cookies (JWT / session)
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-// ------------------------
-// SIGNUP
-// ------------------------
-export async function signup(payload: {
-  fullName: string;
-  email: string;
-  password: string;
-  role: string;
-  phone?: string;
-}) {
-  try {
-    const { data } = await api.post("/auth/register", payload);
-    return data;
-  } catch (err: any) {
-    throw new Error(
-      err.response?.data?.message || "Signup failed"
-    );
-  }
-}
-
-// ------------------------
-// LOGIN
-// ------------------------
-export async function loginRequest(email: string, password: string) {
-  try {
-    const { data } = await api.post("/auth/login", {
-      email,
-      password,
-    });
-
-    // UI-only auth state
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem(
-        "auth",
-        JSON.stringify({
-          userId: data.user.id,
-          email: data.user.email,
-          role: data.user.role,
-          fullName: data.user.fullName,
-        })
-      );
-    }
-
-    return data;
-  } catch (err: any) {
-    throw new Error(
-      err.response?.data?.message || "Invalid credentials"
-    );
-  }
-}
-
-// ------------------------
-// GET CURRENT USER PROFILE
-// ------------------------
-export async function getProfile() {
-  try {
-    const { data } = await api.get("/profile/me");
-    return data;
-  } catch (err: any) {
-    throw new Error(
-      err.response?.data?.message || "Unauthorized"
-    );
-  }
-}
-
-// ------------------------
-// UPDATE PROFILE
-// ------------------------
-export async function updateProfile(payload: any) {
-  try {
-    const { data } = await api.patch("/profile/me", payload);
-    return data;
-  } catch (err: any) {
-    throw new Error(
-      err.response?.data?.message || "Update failed"
-    );
-  }
-}
-
-// ------------------------
-// AUTH GETTER
-// ------------------------
 export const getAuth = () => {
   if (typeof window === "undefined") return null;
   try {
@@ -259,15 +215,8 @@ export const getAuth = () => {
   }
 };
 
-// ------------------------
-// LOGOUT
-// ------------------------
-export const logout = async () => {
-  try {
-    await api.post("/auth/logout");
-  } finally {
-    if (typeof window !== "undefined") {
-      sessionStorage.removeItem("auth");
-    }
+export const logout = () => {
+  if (typeof window !== "undefined") {
+    sessionStorage.removeItem("auth");
   }
 };

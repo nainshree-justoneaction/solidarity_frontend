@@ -26,15 +26,16 @@ export default function LoginPage() {
         userId: resp.user.id,
         email: resp.user.email,
         fullName: resp.user.fullName,
-        role: resp.user.role || "Student", // fallback
+        role: resp.user.role || "student", // fallback
+        token: resp.token,
       };
-
+      sessionStorage.setItem("auth", JSON.stringify(authData));
 
       toast.dismiss(toastId);
       toast.success(`Welcome back, ${authData.fullName}!`);
 
       // navigate to role-based dashboard
-      router.push(`/${authData.role.toLowerCase()}/dashboard`);
+      router.push(`/${authData.role}/dashboard`);
     } catch (err: any) {
       toast.dismiss(toastId);
       toast.error(err?.message || "Login failed");
