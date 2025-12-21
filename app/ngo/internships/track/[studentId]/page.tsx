@@ -1,127 +1,156 @@
 "use client";
-import React, { useContext, useState, useEffect } from "react";
-import { NgoContext } from "@/context/NgoContext";
+
+export const dynamic = "force-dynamic";
+
+import React, { useEffect, useState } from "react";
+import { useNGO } from "@/context/NgoContext";
 import { useParams, useRouter } from "next/navigation";
 
-export default function TrackStudent() {
-  const { state, setState } = useContext(NgoContext);
-  const params = useParams();
-  const studentId = params.studentId;
-  const router = useRouter();
+type Task = { text: string; done: boolean };
+type Log = { date: string; text: string };
 
-  // find selected student
-  const selected = (state.selectedInterns || []).find(
-    (s: any) => String(s.studentId) === String(studentId) || String(s.id) === String(studentId)
+export default function TrackStudent() {
+  const router = useRouter();
+  const params = useParams();
+  const studentId = String(params?.studentId || "");
+
+  const { internships } = useNGO();
+
+  // TEMP mock: until backend exists
+  const selected = internships.find(
+    (i) => String(i.id) === studentId
   );
 
-  const [progress, setProgress] = useState<any>({ tasks: [], logs: [] });
-
-  useEffect(() => {
-    const prog = state.progress?.[studentId];
-    if (prog) setProgress(prog);
-  }, [state.progress, studentId]);
-
-  function saveProgress(updated: any) {
-    const nextProgress = { ...(state.progress || {}), [studentId]: updated };
-    setState({ ...state, progress: nextProgress });
-    setProgress(updated);
-  }
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [logs, setLogs] = useState<Log[]>([]);
 
   function addTask(text: string) {
     if (!text.trim()) return;
-    const updated = { ...progress, tasks: [...(progress.tasks || []), { text, done: false }] };
-    saveProgress(updated);
+    setTasks((t) => [...t, { text, done: false }]);
   }
 
-  function toggleTask(i: number) {
-    const tasks = [...(progress.tasks || [])];
-    tasks[i].done = !tasks[i].done;
-    saveProgress({ ...progress, tasks });
+  function toggleTask(index: number) {
+    setTasks((t) =>
+      t.map((x, i) =>
+        i === index ? { ...x, done: !x.done } : x
+      )
+    );
   }
 
   function addLog() {
     const txt = prompt("Enter log");
-    if (!txt) return;
-    const updated = { ...progress, logs: [...(progress.logs || []), { date: new Date().toLocaleString(), text: txt }] };
-    saveProgress(updated);
+    if (!txt?.trim()) return;
+
+    setLogs((l) => [
+      { date: new Date().toLocaleString(), text: txt },
+      ...l,
+    ]);
   }
 
-  if (!selected) return <div className="text-zinc-400">Selected intern not found.</div>;
+  if (!selected) {
+    return <div className="text-zinc-400">Intern not found.</div>;
+  }
 
-  const completed = (progress.tasks || []).filter((t: any) => t.done).length;
-  const total = (progress.tasks || []).length;
-  const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+  const completed = tasks.filter((t) => t.done).length;
+  const percent =
+    tasks.length === 0
+      ? 0
+      : Math.round((completed / tasks.length) * 100);
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">{selected.student?.name || selected.name}</h1>
-          <div className="text-zinc-400 text-sm">{selected.student?.college}</div>
-        </div>
-        <div>
-          <button onClick={() => router.back()} className="text-zinc-300">Back</button>
-        </div>
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-semibold">{selected.title}</h1>
+        <button onClick={() => router.back()} className="text-zinc-300">
+          Back
+        </button>
       </div>
 
       <div>
-        <div className="text-zinc-400">Progress: {percent}%</div>
-        <div className="w-full h-2 bg-zinc-800 rounded mt-2">
-          <div className="h-2 bg-emerald-400 rounded" style={{ width: `${percent}%` }} />
+        <p className="text-zinc-400">Progress: {percent}%</p>
+        <div className="h-2 bg-zinc-800 rounded mt-2">
+          <div
+            className="h-2 bg-emerald-400 rounded"
+            style={{ width: `${percent}%` }}
+          />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid lg:grid-cols-2 gap-6">
         {/* Tasks */}
         <div>
-          <h3 className="text-white font-semibold mb-2">Tasks</h3>
-          <div className="bg-[#0F0F0F] border border-[#202020] rounded p-4 space-y-2">
-            {(progress.tasks || []).length === 0 && <div className="text-zinc-400">No tasks yet.</div>}
-            {(progress.tasks || []).map((t: any, i: number) => (
-              <div key={i} className="flex items-center justify-between">
-                <div className={`${t.done ? "line-through text-zinc-400" : ""}`}>{t.text}</div>
-                <button onClick={() => toggleTask(i)} className="px-2 py-1 bg-white text-black rounded-md text-sm">
+          <h3 className="font-semibold mb-2">Tasks</h3>
+          <div className="bg-[#0F0F0F] border border-[#202020] p-4 rounded space-y-2">
+            {tasks.length === 0 && (
+              <div className="text-zinc-400">No tasks yet.</div>
+            )}
+
+            {tasks.map((t, i) => (
+              <div key={i} className="flex justify-between">
+                <span className={t.done ? "line-through text-zinc-400" : ""}>
+                  {t.text}
+                </span>
+                <button
+                  onClick={() => toggleTask(i)}
+                  className="bg-white text-black px-2 py-1 rounded text-sm"
+                >
                   {t.done ? "Undo" : "Done"}
                 </button>
               </div>
             ))}
-            <div className="pt-3 flex gap-2">
-              <input
-                id="newTask"
-                placeholder="New task"
-                className="flex-1 bg-[#0B0B0B] border border-zinc-800 rounded px-3 py-2 text-white"
-              />
-              <button
-                onClick={() => {
-                  const el = document.getElementById("newTask") as HTMLInputElement;
-                  addTask(el.value);
-                  el.value = "";
-                }}
-                className="px-3 py-2 bg-white text-black rounded-md"
-              >
-                Add
-              </button>
-            </div>
+
+            <TaskInput onAdd={addTask} />
           </div>
         </div>
 
         {/* Logs */}
         <div>
-          <h3 className="text-white font-semibold mb-2">Logs</h3>
-          <div className="bg-[#0F0F0F] border border-[#202020] rounded p-4 space-y-3">
-            {(progress.logs || []).length === 0 && <div className="text-zinc-400">No logs yet.</div>}
-            {(progress.logs || []).map((l: any, i: number) => (
+          <h3 className="font-semibold mb-2">Logs</h3>
+          <div className="bg-[#0F0F0F] border border-[#202020] p-4 rounded space-y-3">
+            {logs.length === 0 && (
+              <div className="text-zinc-400">No logs yet.</div>
+            )}
+
+            {logs.map((l, i) => (
               <div key={i}>
-                <div className="text-zinc-400 text-xs">{l.date}</div>
-                <div className="text-white">{l.text}</div>
+                <p className="text-xs text-zinc-400">{l.date}</p>
+                <p>{l.text}</p>
               </div>
             ))}
-            <div className="pt-3">
-              <button onClick={addLog} className="px-3 py-2 bg-white text-black rounded-md">Add Log</button>
-            </div>
+
+            <button
+              onClick={addLog}
+              className="bg-white text-black px-3 py-2 rounded"
+            >
+              Add Log
+            </button>
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function TaskInput({ onAdd }: { onAdd: (t: string) => void }) {
+  const [value, setValue] = useState("");
+
+  return (
+    <div className="flex gap-2 pt-3">
+      <input
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        placeholder="New task"
+        className="flex-1 bg-[#0B0B0B] border border-zinc-800 px-3 py-2 rounded"
+      />
+      <button
+        onClick={() => {
+          onAdd(value);
+          setValue("");
+        }}
+        className="bg-white text-black px-3 py-2 rounded"
+      >
+        Add
+      </button>
     </div>
   );
 }

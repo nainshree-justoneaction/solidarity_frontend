@@ -1,13 +1,15 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import React from "react";
-import { useNGOInternships } from "@/context/NGOInternshipsContext";
+import { useNGO } from "@/context/NgoContext";
 import InternshipCard from "@/components/ngo/IntenshipsCard";
 import { useRouter } from "next/navigation";
 
 export default function InternshipsHome() {
   const router = useRouter();
-  const { internships } = useNGOInternships();
+  const { internships } = useNGO();
 
   return (
     <div className="space-y-6">
@@ -42,7 +44,9 @@ export default function InternshipsHome() {
               key={it.id}
               internship={it}
               onView={() => router.push(`/ngo/internships/${it.id}`)}
-              onApplicants={() => router.push(`/ngo/internships/${it.id}`)}
+              onApplicants={() =>
+                router.push(`/ngo/internships/${it.id}`)
+              }
             />
           ))
         )}
