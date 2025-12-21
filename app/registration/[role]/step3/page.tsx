@@ -96,10 +96,13 @@ export default function Step3() {
             ))}
 
             {/* Interest Selector */}
-            <div>
-              <div className="text-white/80 text-lg mb-4">Select Your Interests</div>
-              <InterestSelector value={interests} onChange={setInterests} />
-            </div>
+            {/* Interest Selector */}
+            {["student", "ngo"].includes(role) && (
+              <div>
+                <div className="text-white/80 text-lg mb-4">Select Your Interests</div>
+                <InterestSelector value={interests} onChange={setInterests} />
+              </div>
+            )}
 
             <div className="flex gap-6 pt-4">
               <button

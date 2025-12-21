@@ -1,17 +1,19 @@
 "use client";
-import React, { useContext } from "react";
-import { NgoContext } from "@/context/NgoContext";
+
+import React from "react";
+import { useNGOInternships } from "@/context/NGOInternshipsContext";
 import InternshipCard from "@/components/ngo/IntenshipsCard";
 import { useRouter } from "next/navigation";
 
 export default function InternshipsHome() {
-  const { state } = useContext(NgoContext);
   const router = useRouter();
+  const { internships } = useNGOInternships();
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Internships</h1>
+
         <div className="flex gap-2">
           <button
             onClick={() => router.push("/ngo/internships/post")}
@@ -19,6 +21,7 @@ export default function InternshipsHome() {
           >
             Post Internship
           </button>
+
           <button
             onClick={() => router.push("/ngo/internships/applicants")}
             className="px-3 py-2 text-zinc-300 border border-zinc-800 rounded-md"
@@ -29,15 +32,17 @@ export default function InternshipsHome() {
       </div>
 
       <div className="grid gap-4">
-        {state.internships.length === 0 ? (
-          <div className="text-zinc-400">No internships yet. Post one to start receiving applications.</div>
+        {internships.length === 0 ? (
+          <div className="text-zinc-400">
+            No internships yet. Post one to start receiving applications.
+          </div>
         ) : (
-          state.internships.map((it: any) => (
+          internships.map((it) => (
             <InternshipCard
               key={it.id}
               internship={it}
-              onView={(id) => router.push(`/ngo/internships/${id}`)}
-              onApplicants={(id) => router.push(`/ngo/internships/${id}`)}
+              onView={() => router.push(`/ngo/internships/${it.id}`)}
+              onApplicants={() => router.push(`/ngo/internships/${it.id}`)}
             />
           ))
         )}
