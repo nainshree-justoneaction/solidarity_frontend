@@ -1,82 +1,80 @@
 "use client"
 
-export default function Footer() {
+import { motion } from "framer-motion"
+
+const sdgColors = [
+  "#E5243B",
+  "#DDA63A",
+  "#4C9F38",
+  "#C5192D",
+  "#FF3A21",
+  "#26BDE2",
+  "#FCC30B",
+  "#A21942",
+  "#FD6925",
+  "#DD1367",
+  "#FD9D24",
+  "#BF8B2E",
+  "#3F7E44",
+  "#0A97D9",
+  "#56C02B",
+  "#00689D",
+  "#19486A",
+]
+
+export function Footer() {
   return (
-    <footer className="bg-background text-foreground py-12 px-4 sm:px-6 lg:px-8 border-t border-white/10">
-      <div className="container mx-auto max-w-6xl">
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-8 mb-12">
-          {/* Brand */}
-          <div>
-            <h3 className="font-bold text-xl mb-4 text-white">Solidarity</h3>
-            <p className="text-muted text-sm">
-              Building careers through real opportunities and meaningful connections.
-            </p>
-          </div>
-
-          {/* Links */}
-          <div>
-            <h4 className="font-bold mb-4 text-sm text-white">Platform</h4>
-            <ul className="space-y-2 text-sm text-muted">
-              <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  About Us
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  Programs
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  Blog
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-bold mb-4 text-sm text-white">Company</h4>
-            <ul className="space-y-2 text-sm text-muted">
-              <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  Contact
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  Privacy Policy
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  Terms of Service
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Social */}
-          <div>
-            <h4 className="font-bold mb-4 text-sm text-white">Connect</h4>
-            <div className="flex gap-4">
-              {["Twitter", "LinkedIn", "Instagram"].map((social) => (
-                <a
-                  key={social}
-                  href="#"
-                  className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center hover:border-white/60 hover:white-glow transition-all text-sm text-white/70 hover:text-white"
-                >
-                  {social[0]}
-                </a>
-              ))}
-            </div>
-          </div>
+    <footer className="py-12 border-t border-border">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* SDG color bar */}
+        <div className="flex h-1 rounded-full overflow-hidden mb-8">
+          {sdgColors.map((color, index) => (
+            <motion.div
+              key={index}
+              className="flex-1"
+              style={{ backgroundColor: color }}
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
+            />
+          ))}
         </div>
 
-        {/* Bottom */}
-        <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-muted">© 2025 Solidarity. All rights reserved.</p>
-          <p className="text-sm text-muted">Built for students. By people who care.</p>
+        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="text-center md:text-left">
+            <a href="#" className="text-xl font-bold tracking-tight">
+              <span className="text-foreground">just </span>
+              <span
+                className="bg-clip-text text-transparent"
+                style={{
+                  backgroundImage: "linear-gradient(90deg, #E5243B, #FCC30B, #4C9F38, #26BDE2)",
+                }}
+              >
+                one-xtion
+              </span>
+            </a>
+            <p className="mt-2 text-sm text-muted-foreground">A Parikranti Foundation Initiative</p>
+          </div>
+
+          <div className="flex gap-8 text-sm text-muted-foreground">
+            <a href="#about" className="hover:text-foreground transition-colors">
+              About
+            </a>
+            <a href="#movement" className="hover:text-foreground transition-colors">
+              Movement
+            </a>
+            <a href="#impact" className="hover:text-foreground transition-colors">
+              Impact
+            </a>
+            <a href="#contact" className="hover:text-foreground transition-colors">
+              Contact
+            </a>
+          </div>
+
+          <p className="text-sm text-muted-foreground">
+            © {new Date().getFullYear()} Parikranti Foundation. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
