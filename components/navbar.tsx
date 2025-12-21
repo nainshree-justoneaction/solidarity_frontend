@@ -29,15 +29,14 @@ export function Navbar() {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-background/90 backdrop-blur-md border-b border-border"
-          : "bg-transparent"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
+        ? "bg-background/90 backdrop-blur-md border-b border-border"
+        : "bg-transparent"
+        }`}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          
+
           {/* BRAND */}
           <Link href="/" className="flex flex-col leading-tight">
             <motion.div whileHover={{ scale: 1.03 }} className="text-xl font-bold tracking-tight">
@@ -58,6 +57,7 @@ export function Navbar() {
           </Link>
 
           {/* DESKTOP MENU */}
+          {/* DESKTOP MENU */}
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
               <motion.a
@@ -70,13 +70,29 @@ export function Navbar() {
               </motion.a>
             ))}
 
-            {/* SIGNUP CTA */}
-            <Link href="/auth/signup">
-              <Button size="sm" className="bg-foreground text-background hover:bg-foreground/90">
-                Join Movement
-              </Button>
-            </Link>
+            {/* AUTH CTAs */}
+            <div className="flex items-center gap-3">
+              <Link href="/auth/login">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-border text-foreground hover:bg-card"
+                >
+                  Log in
+                </Button>
+              </Link>
+
+              <Link href="/auth/signup">
+                <Button
+                  size="sm"
+                  className="bg-foreground text-background hover:bg-foreground/90"
+                >
+                  Join Movement
+                </Button>
+              </Link>
+            </div>
           </div>
+
 
           {/* MOBILE BUTTON */}
           <button
@@ -109,11 +125,22 @@ export function Navbar() {
                 </a>
               ))}
 
-              <Link href="/signup" onClick={() => setIsMobileMenuOpen(false)}>
-                <Button className="w-full bg-foreground text-background">
-                  Join Movement
-                </Button>
-              </Link>
+              <div className="pt-2 space-y-2">
+                <Link href="/auth/login" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button
+                    variant="outline"
+                    className="w-full border-border text-foreground"
+                  >
+                    Log in
+                  </Button>
+                </Link>
+
+                <Link href="/auth/signup" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button className="w-full bg-foreground text-background">
+                    Join Movement
+                  </Button>
+                </Link>
+              </div>
             </div>
           </motion.div>
         )}
