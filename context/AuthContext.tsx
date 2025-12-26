@@ -45,6 +45,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 };
 
 
+const FUNDRAISING_CHAPTER = {
+  id: 999,
+  title: "Fundraising & Resource Mobilization",
+  type: "fundraising", // 👈 important flag
+};
+
 export const modulesData = [
   {
     id: "social-training",
@@ -56,6 +62,7 @@ export const modulesData = [
       { id: 2, title: "Chapter 2: Community Work" },
       { id: 3, title: "Chapter 3: Case Study" },
       { id: 4, title: "Chapter 4: Final Quiz" },
+      FUNDRAISING_CHAPTER, // ✅ included
     ],
   },
   {
@@ -67,6 +74,7 @@ export const modulesData = [
       { id: 1, title: "Chapter 1: Basics" },
       { id: 2, title: "Chapter 2: Nutrition" },
       { id: 3, title: "Chapter 3: Exercise" },
+      FUNDRAISING_CHAPTER,
     ],
   },
   {
@@ -78,6 +86,7 @@ export const modulesData = [
       { id: 1, title: "Chapter 1: Overview" },
       { id: 2, title: "Chapter 2: Techniques" },
       { id: 3, title: "Chapter 3: Quiz" },
+      FUNDRAISING_CHAPTER,
     ],
   },
   {
@@ -89,6 +98,8 @@ export const modulesData = [
       { id: 1, title: "Chapter 1: Awareness" },
       { id: 2, title: "Chapter 2: Rights" },
       { id: 3, title: "Chapter 3: Case Study" },
+      FUNDRAISING_CHAPTER,
     ],
   },
 ];
+

@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import toast from "react-hot-toast"
 
 export const loadRazorpay = () =>
@@ -18,18 +18,22 @@ export const loadRazorpay = () =>
     document.body.appendChild(script)
   })
 
-export default function PaymentPage() {
+export default function FundraisingPaymentPage() {
   const router = useRouter()
+  const params = useSearchParams()
 
-  const email = "student@email.com"
+  const moduleId = params.get("module") || "training"
+  const email = "student@email.com" // replace later from auth
+
+  const MIN_CONTRIBUTION = 365
 
   const handlePayment = async () => {
-    toast.loading("Preparing payment...")
+    toast.loading("Preparing secure contribution...")
 
     const loaded = await loadRazorpay()
     if (!loaded) {
       toast.dismiss()
-      toast.error("Payment system failed to load")
+      toast.error("Unable to load payment gateway")
       return
     }
 
@@ -37,81 +41,101 @@ export default function PaymentPage() {
 
     const options = {
       key: "rzp_test_RnEuedaujMr5dq",
-      amount: 36500,
+      amount: MIN_CONTRIBUTION * 100,
       currency: "INR",
-      name: "Solidarity",
-      description: "1-Year Access Subscription",
+      name: "Just One Action",
+      description: "Contribution towards social impact initiative",
       prefill: { email },
-      theme: { color: "#F9C80E" },
+      theme: { color: "#16a34a" }, // green = contribution, not payment
       handler: () => {
-        localStorage.setItem("solidarity_paid", "true")
-        toast.success("Payment Successful!")
-        router.push("/payment/payment-success")
-      }
+        // 🔐 mark fundraising done for this module
+        const data = JSON.parse(
+          localStorage.getItem("fundraising_completed") || "{}"
+        )
+        data[moduleId] = true
+        localStorage.setItem(
+          "fundraising_completed",
+          JSON.stringify(data)
+        )
+
+        toast.success("Thank you for contributing to the cause 🙏")
+        router.push(`/student/training/${moduleId}/certificate`)
+      },
     }
 
     const rzp = new (window as any).Razorpay(options)
-    rzp.on("payment.failed", () => toast.error("Payment Failed"))
+    rzp.on("payment.failed", () =>
+      toast.error("Contribution failed. Please try again.")
+    )
     rzp.open()
   }
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
 
-      {/* Header */}
-      <header className="flex items-center justify-between px-10 py-6 border-b border-white/10 bg-black/40 backdrop-blur-md sticky top-0">
-        <Link href="/student/dashboard" className="text-white/70 hover:text-white transition">
-          ← Back
+      {/* HEADER */}
+      <header className="flex items-center justify-between px-8 py-6 border-b border-white/10 bg-black/60 backdrop-blur sticky top-0">
+        <Link
+          href={`/student/training/${moduleId}`}
+          className="text-white/70 hover:text-white transition"
+        >
+          ← Back to Training
         </Link>
-        <h1 className="text-2xl font-semibold tracking-wide">Solidarity</h1>
-        <div></div>
+        <h1 className="text-xl font-semibold tracking-wide">
+          Fundraising Contribution
+        </h1>
+        <div />
       </header>
 
-      <main className="w-full max-w-3xl mx-auto px-8 md:px-0 py-20">
+      <main className="w-full max-w-3xl mx-auto px-6 py-20">
 
-        {/* Title */}
-        <div className="mb-16 text-center">
-          <h1 className="text-5xl font-bold mb-4">Activate Your Access</h1>
-          <p className="text-3xl font-semibold text-yellow-400">₹365 / year</p>
-          <p className="text-white/70 mt-3 text-lg tracking-wide">
-            One-time payment. Instant access to everything.
+        {/* CONTEXT */}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl font-bold mb-4">
+            Complete Your Training Journey
+          </h1>
+          <p className="text-white/70 text-lg max-w-xl mx-auto">
+            As part of this module, you’re required to participate in
+            fundraising or resource mobilization to support real on-ground work.
           </p>
         </div>
 
-        {/* Benefits */}
-        <section className="mb-20 space-y-6">
-          {[
-            ["🌍", "Social Internships"],
-            ["📚", "Training Modules"],
-            ["🏭", "Industrial Visits"],
-            ["📊", "Progress Tracking"],
-          ].map(([icon, title], i) => (
-            <div
-              key={i}
-              className="flex items-center gap-5 p-5 border border-white/10 rounded-2xl 
-                         bg-white/5 hover:bg-white/10 transition"
-            >
-              <div className="text-3xl">{icon}</div>
-              <p className="text-xl font-medium">{title}</p>
-            </div>
-          ))}
-        </section>
+        {/* CONTRIBUTION CARD */}
+        <div className="rounded-3xl border border-green-400/30 bg-green-500/5 p-10 text-center">
 
-        {/* Pay Button */}
-        <div className="text-center">
+          <p className="text-green-300 text-sm uppercase tracking-wide mb-3">
+            Minimum Contribution
+          </p>
+
+          <h2 className="text-6xl font-bold text-green-400 mb-4">
+            ₹{MIN_CONTRIBUTION}
+          </h2>
+
+          <p className="text-white/70 mb-10 text-lg">
+            This contribution supports verified social initiatives aligned with
+            your training module.
+          </p>
+
           <button
             onClick={handlePayment}
-            className="text-2xl font-semibold px-16 py-5 
-                       bg-yellow-400 text-black rounded-2xl
-                       hover:scale-[1.03] transition-transform shadow-lg"
+            className="px-14 py-5 text-xl font-semibold rounded-2xl
+                       bg-green-400 text-black
+                       hover:bg-green-300 transition
+                       shadow-lg"
           >
-            Pay ₹365
+            Contribute ₹{MIN_CONTRIBUTION}
           </button>
 
-          <p className="text-white/50 text-sm mt-4">
-            Secure payment powered by Razorpay
+          <p className="text-white/50 text-sm mt-6">
+            Secure contribution powered by Razorpay
           </p>
         </div>
+
+        {/* NOTE */}
+        <p className="text-white/40 text-sm mt-10 text-center max-w-xl mx-auto">
+          This is not a fee or subscription. Your contribution directly supports
+          social impact initiatives and enables certification for this module.
+        </p>
       </main>
     </div>
   )

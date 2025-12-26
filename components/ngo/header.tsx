@@ -1,32 +1,69 @@
-"use client"
+"use client";
 
-import { Bell, User } from "lucide-react"
+import { Bell, ChevronDown } from "lucide-react";
 
-export default function NGOHeader() {
+export default function NGOHeader({
+  title,
+  subtitle,
+}: {
+  title: string;
+  subtitle?: string;
+}) {
   return (
-    <header className="border-b border-white/10 bg-black/50 sticky top-0 z-30">
-      <div className="px-8 py-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-white">NGO Dashboard</h1>
+    <header
+      className="
+        sticky top-0 z-40
+        bg-black/80 backdrop-blur-xl
+        border-b border-white/10
+      "
+    >
+      <div className="h-16 px-8 flex items-center justify-between">
 
-        <div className="flex items-center gap-6">
+        {/* LEFT */}
+        <div>
+          <h1 className="text-lg font-semibold text-white">
+            {title}
+          </h1>
+          {subtitle && (
+            <p className="text-xs text-white/50">
+              {subtitle}
+            </p>
+          )}
+        </div>
+
+        {/* RIGHT */}
+        <div className="flex items-center gap-4">
+
           {/* Notifications */}
-          <button className="relative p-2 hover:bg-white/5 rounded transition-colors border border-transparent hover:border-white/10">
-            <Bell size={22} className="text-foreground" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-[#e5243b] rounded-full" />
+          <button
+            className="
+              relative p-2 rounded-lg
+              hover:bg-white/5 transition
+            "
+          >
+            <Bell size={18} />
+            <span className="absolute top-1 right-1 w-2 h-2 bg-[#00ADEF] rounded-full" />
           </button>
 
-          {/* Avatar */}
-          <div className="flex items-center gap-3 pl-6 border-l border-white/10">
-            <div className="w-10 h-10 rounded-full border border-white/20 bg-white/5 flex items-center justify-center">
-              <User size={20} className="text-secondary" />
+          {/* Profile */}
+          <button
+            className="
+              flex items-center gap-2 px-3 py-2
+              rounded-lg hover:bg-white/5 transition
+            "
+          >
+            <div className="w-8 h-8 rounded-full bg-[#00ADEF]/20 flex items-center justify-center text-[#00ADEF] font-bold">
+              P
             </div>
-            <div className="hidden sm:block">
-              <p className="text-sm font-medium text-white">NGO Admin</p>
-              <p className="text-xs text-secondary">Administrator</p>
+            <div className="hidden md:block text-left">
+              <p className="text-sm font-medium">Parikranti Foundation</p>
+              <p className="text-xs text-white/50">NGO Admin</p>
             </div>
-          </div>
+            <ChevronDown size={14} className="text-white/50" />
+          </button>
+
         </div>
       </div>
     </header>
-  )
+  );
 }

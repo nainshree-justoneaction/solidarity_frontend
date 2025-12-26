@@ -45,23 +45,73 @@
   --sdg-16-blue: #0066cc;
   --sdg-17-multi: #e5243b;
 
-  .bg-sdg1 { background: #e5243b; }
-  .bg-sdg2 { background: #dda63a; }
-  .bg-sdg3 { background: #4c9f38; }
-  .bg-sdg4 { background: #c5192d; }
-  .bg-sdg5 { background: #ff3a21; }
-  .bg-sdg6 { background: #26bde2; }
-  .bg-sdg7 { background: #fcc30b; }
-  .bg-sdg8 { background: #a21942; }
-  .bg-sdg9 { background: #fd6925; }
-  .bg-sdg10 { background: #dd1367; }
-  .bg-sdg11 { background: #fd9d24; }
-  .bg-sdg12 { background: #bf8b2e; }
-  .bg-sdg13 { background: #3f7e44; }
-  .bg-sdg14 { background: #0a97d9; }
-  .bg-sdg15 { background: #56c02b; }
-  .bg-sdg16 { background: #00689d; }
-  .bg-sdg17 { background: #19486a; }
+  .bg-sdg1 {
+    background: #e5243b;
+  }
+
+  .bg-sdg2 {
+    background: #dda63a;
+  }
+
+  .bg-sdg3 {
+    background: #4c9f38;
+  }
+
+  .bg-sdg4 {
+    background: #c5192d;
+  }
+
+  .bg-sdg5 {
+    background: #ff3a21;
+  }
+
+  .bg-sdg6 {
+    background: #26bde2;
+  }
+
+  .bg-sdg7 {
+    background: #fcc30b;
+  }
+
+  .bg-sdg8 {
+    background: #a21942;
+  }
+
+  .bg-sdg9 {
+    background: #fd6925;
+  }
+
+  .bg-sdg10 {
+    background: #dd1367;
+  }
+
+  .bg-sdg11 {
+    background: #fd9d24;
+  }
+
+  .bg-sdg12 {
+    background: #bf8b2e;
+  }
+
+  .bg-sdg13 {
+    background: #3f7e44;
+  }
+
+  .bg-sdg14 {
+    background: #0a97d9;
+  }
+
+  .bg-sdg15 {
+    background: #56c02b;
+  }
+
+  .bg-sdg16 {
+    background: #00689d;
+  }
+
+  .bg-sdg17 {
+    background: #19486a;
+  }
 }
 
 .dark {
@@ -123,17 +173,20 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
 
 @layer utilities {
+
   /* removed neon animations and updated for black-white theme */
   @keyframes fade-in {
     from {
       opacity: 0;
     }
+
     to {
       opacity: 1;
     }
@@ -144,6 +197,7 @@
       opacity: 0;
       transform: translateY(20px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -154,9 +208,11 @@
     from {
       width: 0;
     }
+
     to {
       width: 100%;
     }
+
   }
 
   .animate-fade-in {

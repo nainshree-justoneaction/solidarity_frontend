@@ -1,54 +1,47 @@
-"use client";
-import { useState, useContext } from "react";
-import { DonationsContext } from "@/context/DonationContext";
-import { useRouter } from "next/navigation";
+"use client"
 
-export default function PostDonation() {
-  const { addDonationRequest } = useContext(DonationsContext);
-  const router = useRouter();
+import Link from "next/link"
+import { IndianRupee, Package } from "lucide-react"
 
-  const [title, setTitle] = useState("");
-  const [target, setTarget] = useState("");
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!title || !target) return alert("Fill all fields");
-
-    const newId = addDonationRequest({ title, target: Number(target) });
-    router.push(`/ngo/donations/${newId}`);
-  };
-
+export default function SelectDonationType() {
   return (
-    <div className="p-8 max-w-md mx-auto space-y-6">
-      <h1 className="text-2xl font-bold text-white">Post a New Donation</h1>
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <div className="flex flex-col">
-          <label className="text-white mb-1">Donation Title</label>
-          <input
-            type="text"
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            className="p-2 rounded bg-zinc-800 text-white"
-            required
-          />
-        </div>
-        <div className="flex flex-col">
-          <label className="text-white mb-1">Target Amount</label>
-          <input
-            type="number"
-            value={target}
-            onChange={e => setTarget(e.target.value)}
-            className="p-2 rounded bg-zinc-800 text-white"
-            required
-          />
-        </div>
-        <button
-          type="submit"
-          className="bg-green-500 px-4 py-2 rounded font-semibold hover:bg-green-600 transition"
-        >
-          Post Donation
-        </button>
-      </form>
+    <div className="max-w-4xl mx-auto py-24 space-y-10 text-white">
+
+      <div className="text-center">
+        <h1 className="text-3xl font-bold">What do you want to post?</h1>
+        <p className="text-white/60 mt-2">
+          Choose the type of donation request
+        </p>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-8">
+        <TypeCard
+          title="Money Donation"
+          desc="Raise funds transparently for your cause"
+          icon={<IndianRupee size={32} />}
+          href="/ngo/donations/money/post/"
+        />
+
+        <TypeCard
+          title="Material Donation"
+          desc="Request books, clothes, essentials & more"
+          icon={<Package size={32} />}
+          href="/ngo/donations/material/post"
+        />
+      </div>
     </div>
-  );
+  )
+}
+
+function TypeCard({ title, desc, icon, href }: any) {
+  return (
+    <Link href={href}>
+      <div className="bg-[#0f172a] border border-white/10 rounded-3xl p-10
+                      hover:border-green-400/40 hover:bg-green-500/5 transition">
+        <div className="text-green-400 mb-4">{icon}</div>
+        <h3 className="text-xl font-semibold">{title}</h3>
+        <p className="text-white/60 text-sm mt-1">{desc}</p>
+      </div>
+    </Link>
+  )
 }

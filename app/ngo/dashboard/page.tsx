@@ -1,186 +1,172 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { useEffect, useState } from "react";
+import Link from "next/link"
+import { useState } from "react"
+import {
+  Briefcase,
+  IndianRupee,
+  CalendarDays,
+  Users,
+} from "lucide-react"
 
-export default function Dashboard() {
-  const ngoName = "Parikranti Foundation";
+/* ---------------- PAGE ---------------- */
 
-  // Temporary mock data — replace with API calls later
-  const [donations, setDonations] = useState([
-    { id: 1, donor: "Acme Foundation", amount: 50000, date: "2025-11-12" },
-    { id: 2, donor: "Local Donor", amount: 1500, date: "2025-11-20" },
-  ]);
+export default function NGODashboard() {
+  const ngoName = "Parikranti Foundation"
 
-  const [internships, setInternships] = useState([
-    {
-      id: 1,
-      title: "Community Outreach Coordinator",
-      applicants: 6,
-      status: "Open",
-    },
-    {
-      id: 2,
-      title: "Water Quality Intern",
-      applicants: 18,
-      status: "Open",
-    },
-  ]);
+  // dummy data
+  const internships = [
+    { id: 1, title: "Community Outreach Coordinator", applicants: 6 },
+    { id: 2, title: "Water Quality Intern", applicants: 18 },
+  ]
+
+  const donations = [
+    { id: 1, donor: "Acme Foundation", amount: 50000, date: "12 Nov 2025" },
+    { id: 2, donor: "Local Donor", amount: 1500, date: "20 Nov 2025" },
+  ]
 
   return (
-    <div className="p-6 text-white">
-      {/* TOP HEADING */}
-      <h2 className="text-sm opacity-60 mb-1">Dashboard</h2>
-      <h1 className="text-3xl font-semibold">Welcome back, {ngoName}</h1>
-      <p className="opacity-70 mt-1">
-        What would you like to do today?
-      </p>
+    <div className="max-w-7xl mx-auto px-6 py-10 space-y-14 text-white">
 
-      {/* ACTION BOXES */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-        <Link href="/ngo/internships">
-          <div className="p-5 rounded-xl bg-[#111] hover:bg-[#151515] cursor-pointer">
-            <h3 className="text-lg font-semibold">Hire Interns</h3>
-            <p className="text-sm opacity-70">
-              Post roles & track student applicants.
-            </p>
-            <button className="mt-3 bg-white text-black text-sm px-4 py-1 rounded">
-              Open →
-            </button>
-          </div>
-        </Link>
+      {/* ================= HERO ================= */}
+      <section className="space-y-2">
+        <p className="text-sm text-white/50">NGO Dashboard</p>
+        <h1 className="text-4xl font-bold">{ngoName}</h1>
+        <p className="text-white/60 max-w-2xl">
+          Manage internships, donations, and social initiatives from one place.
+        </p>
+      </section>
 
-        <Link href="/ngo/donations">
-          <div className="p-5 rounded-xl bg-[#111] hover:bg-[#151515] cursor-pointer">
-            <h3 className="text-lg font-semibold">Donations</h3>
-            <p className="text-sm opacity-70">
-              Create donation drives & monitor funds.
-            </p>
-            <button className="mt-3 bg-white text-black text-sm px-4 py-1 rounded">
-              Open →
-            </button>
-          </div>
-        </Link>
+      {/* ================= QUICK STATS ================= */}
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <Stat icon={Briefcase} label="Internships Posted" value={internships.length} />
+        <Stat icon={Users} label="Total Applicants" value={24} />
+        <Stat icon={IndianRupee} label="Donation Drives" value={2} />
+        <Stat icon={CalendarDays} label="Events Planned" value={1} />
+      </section>
 
-        <Link href="/ngo/events">
-          <div className="p-5 rounded-xl bg-[#111] hover:bg-[#151515] cursor-pointer">
-            <h3 className="text-lg font-semibold">Events & CSR</h3>
-            <p className="text-sm opacity-70">
-              Plan events & send notifications.
-            </p>
-            <button className="mt-3 bg-white text-black text-sm px-4 py-1 rounded">
-              Open →
-            </button>
-          </div>
-        </Link>
-      </div>
+      {/* ================= PRIMARY ACTIONS ================= */}
+      <section className="grid md:grid-cols-3 gap-6">
+        <ActionCard
+          title="Hire Interns"
+          description="Post internships and review student applications."
+          href="/ngo/internships"
+        />
 
-      {/* PROGRESS OVERVIEW */}
-      <h2 className="text-xl font-semibold mt-10 mb-3">Your Progress Overview</h2>
+        <ActionCard
+          title="Manage Donations"
+          description="Create donation drives and track contributions."
+          href="/ngo/donations"
+        />
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Stat number={internships.length} title="Internships Posted" color="red" />
-        <Stat number={24} title="Applications Received" color="blue" />
-        <Stat number={2} title="Donation Drives" color="teal" />
-        <Stat number={1} title="Events Planned" color="orange" />
-      </div>
+        <ActionCard
+          title="Events & CSR"
+          description="Plan events, CSR activities, and volunteer drives."
+          href="/ngo/events"
+        />
+      </section>
 
-      {/* RECENT SECTIONS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+      {/* ================= ACTIVITY ================= */}
+      <section className="grid md:grid-cols-3 gap-8">
 
-        {/* RECENT INTERNSHIPS */}
-        <div className="bg-[#111] p-5 rounded-xl">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="font-semibold">Recent Internships</h3>
-            <Link href="/ngo/internships/create">
-              <button className="text-black bg-white px-3 py-1 rounded text-sm">
-                Post
-              </button>
-            </Link>
-          </div>
-
+        {/* Internships */}
+        <ActivityCard
+          title="Recent Internships"
+          actionLabel="Post Internship"
+          actionHref="/ngo/internships/create"
+        >
           {internships.map((i) => (
-            <div key={i.id} className="border-b border-white/10 py-3">
-              <h4 className="font-medium">{i.title}</h4>
-              <p className="text-sm opacity-70">
-                {i.applicants} applicants • {i.status}
-              </p>
-              <Link
-                href={`/ngo/internships/${i.id}`}
-                className="text-blue-400 text-sm"
-              >
-                View
-              </Link>
-            </div>
+            <Row
+              key={i.id}
+              title={i.title}
+              meta={`${i.applicants} applicants`}
+              href={`/ngo/internships/${i.id}`}
+            />
           ))}
-        </div>
+        </ActivityCard>
 
-        {/* RECENT DONATIONS */}
-        <div className="bg-[#111] p-5 rounded-xl">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="font-semibold">Recent Donations</h3>
-            <Link href="/ngo/donations/create">
-              <button className="text-black bg-white px-3 py-1 rounded text-sm">
-                Add
-              </button>
-            </Link>
-          </div>
-
+        {/* Donations */}
+        <ActivityCard
+          title="Recent Donations"
+          actionLabel="Add Donation"
+          actionHref="/ngo/donations/create"
+        >
           {donations.map((d) => (
-            <div key={d.id} className="border-b border-white/10 py-3">
-              <h4 className="font-medium">{d.donor}</h4>
-              <p className="text-sm opacity-70">
-                ₹{d.amount.toLocaleString()} • {d.date}
-              </p>
-              <Link
-                className="text-blue-400 text-sm"
-                href={`/ngo/donations/${d.id}`}
-              >
-                View
-              </Link>
-            </div>
+            <Row
+              key={d.id}
+              title={d.donor}
+              meta={`₹${d.amount.toLocaleString()} • ${d.date}`}
+              href={`/ngo/donations/${d.id}`}
+            />
           ))}
-        </div>
+        </ActivityCard>
 
-        {/* UPCOMING EVENTS */}
-        <div className="bg-[#111] p-5 rounded-xl">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="font-semibold">Upcoming Events</h3>
-            <button className="text-black bg-white px-3 py-1 rounded text-sm">
-              Create
-            </button>
-          </div>
-
-          <div className="border-b border-white/10 py-3">
-            <h4 className="font-medium">Beach Cleanup Drive</h4>
-            <p className="text-sm opacity-70">
-              2026-01-24 • 40 volunteers needed
-            </p>
-            <Link href="#" className="text-blue-400 text-sm">
-              View
-            </Link>
-          </div>
-        </div>
-      </div>
+        {/* Events */}
+        <ActivityCard
+          title="Upcoming Events"
+          actionLabel="Create Event"
+          actionHref="/ngo/events/create"
+        >
+          <Row
+            title="Beach Cleanup Drive"
+            meta="24 Jan 2026 • 40 volunteers"
+            href="#"
+          />
+        </ActivityCard>
+      </section>
     </div>
-  );
+  )
 }
 
-function Stat({ number, title, color }: any) {
-  const dotColor = {
-    red: "bg-red-500",
-    blue: "bg-blue-500",
-    teal: "bg-teal-400",
-    orange: "bg-orange-400",
-  };
+/* ================= COMPONENTS ================= */
 
+function Stat({ icon: Icon, label, value }: any) {
   return (
-    <div className="bg-[#111] p-4 rounded-xl">
-      <div className="flex items-center gap-2">
-        <span className={`w-3 h-3 rounded-full ${dotColor[color]}`}></span>
-        <p className="text-sm opacity-75">{title}</p>
-      </div>
-      <h2 className="text-2xl font-semibold mt-2">{number}</h2>
+    <div className="rounded-2xl bg-white/5 border border-white/10 p-5">
+      <Icon className="h-6 w-6 text-white/70 mb-3" />
+      <p className="text-sm text-white/60">{label}</p>
+      <p className="text-3xl font-bold mt-1">{value}</p>
     </div>
-  );
+  )
+}
+
+function ActionCard({ title, description, href }: any) {
+  return (
+    <Link href={href}>
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-6 hover:bg-white/10 transition cursor-pointer h-full">
+        <h3 className="text-xl font-semibold mb-2">{title}</h3>
+        <p className="text-sm text-white/60">{description}</p>
+        <p className="mt-4 text-sm text-blue-400">Open →</p>
+      </div>
+    </Link>
+  )
+}
+
+function ActivityCard({ title, actionLabel, actionHref, children }: any) {
+  return (
+    <div className="rounded-2xl bg-white/5 border border-white/10 p-6">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-semibold">{title}</h3>
+        <Link
+          href={actionHref}
+          className="text-xs bg-white text-black px-3 py-1 rounded"
+        >
+          {actionLabel}
+        </Link>
+      </div>
+      <div className="space-y-4">{children}</div>
+    </div>
+  )
+}
+
+function Row({ title, meta, href }: any) {
+  return (
+    <div className="border-b border-white/10 pb-3 last:border-0">
+      <p className="font-medium">{title}</p>
+      <p className="text-sm text-white/60">{meta}</p>
+      <Link href={href} className="text-sm text-blue-400">
+        View
+      </Link>
+    </div>
+  )
 }

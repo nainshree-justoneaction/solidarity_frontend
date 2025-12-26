@@ -3,13 +3,20 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
 /* ------------------------------------------------------------------
-   Types
+   TYPES
 ------------------------------------------------------------------ */
+
 export interface Internship {
   id: number;
   title: string;
-  applicants: number;
-  status: string;
+  description: string;
+  skills: string[];
+  location: string;
+  mode: "On-site" | "Remote" | "Hybrid";
+  sdg: string;
+  applicants: any[];        // keep array for future
+  status: "Open" | "Closed";
+  createdAt: string;
 }
 
 export interface DonationDrive {
@@ -18,14 +25,6 @@ export interface DonationDrive {
   target: number;
   collected: number;
   percentage: number;
-  donors: DonorEntry[];
-}
-
-export interface DonorEntry {
-  id: number;
-  donor: string;
-  amount: number;
-  date: string;
 }
 
 export interface EventEntry {
@@ -44,63 +43,79 @@ export interface NotificationEntry {
 }
 
 /* ------------------------------------------------------------------
-   Context Shape
+   CONTEXT SHAPE
 ------------------------------------------------------------------ */
+
 interface NGOContextType {
   internships: Internship[];
   donations: DonationDrive[];
   events: EventEntry[];
   notifications: NotificationEntry[];
 
-  postInternship: (i: Omit<Internship, "id" | "applicants">) => void;
-  addApplicant: (internshipId: number) => void;
+  addInternship: (i: Omit<Internship, "id" | "applicants" | "createdAt">) => void;
+  addApplicant: (internshipId: number, applicant?: any) => void;
 }
 
 /* ------------------------------------------------------------------
-   SAFE DEFAULT (prevents build crash)
+   SAFE DEFAULT
 ------------------------------------------------------------------ */
+
 const defaultContext: NGOContextType = {
   internships: [],
   donations: [],
   events: [],
   notifications: [],
-  postInternship: () => {},
+  addInternship: () => {},
   addApplicant: () => {},
 };
 
 export const NGOContext = createContext<NGOContextType>(defaultContext);
 
 /* ------------------------------------------------------------------
-   Provider
+   PROVIDER
 ------------------------------------------------------------------ */
+
 export function NGOProvider({ children }: { children: React.ReactNode }) {
   const [internships, setInternships] = useState<Internship[]>([]);
 
+  /* ---------- LOAD ---------- */
   useEffect(() => {
     const stored = localStorage.getItem("ngo_internships");
     if (stored) setInternships(JSON.parse(stored));
   }, []);
 
+  /* ---------- SAVE ---------- */
   useEffect(() => {
     localStorage.setItem("ngo_internships", JSON.stringify(internships));
   }, [internships]);
 
-  function postInternship(data: Omit<Internship, "id" | "applicants">) {
-    setInternships((prev) => [
-      {
-        id: Date.now(),
-        title: data.title,
-        status: "Open",
-        applicants: 0,
-      },
-      ...prev,
-    ]);
+  /* ---------- ACTIONS ---------- */
+
+  function addInternship(
+    data: Omit<Internship, "id" | "applicants" | "createdAt">
+  ) {
+    const newInternship: Internship = {
+      id: Date.now(),
+      title: data.title,
+      description: data.description,
+      skills: data.skills || [],
+      location: data.location,
+      mode: data.mode,
+      sdg: data.sdg,
+      status: data.status ?? "Open",
+      applicants: [],
+      createdAt: new Date().toISOString(),
+    };
+
+    setInternships((prev) => [newInternship, ...prev]);
   }
 
-  function addApplicant(id: number) {
+  function addApplicant(internshipId: number, applicant: any = {}) {
     setInternships((prev) =>
       prev.map((i) =>
-        i.id === id ? { ...i, applicants: i.applicants + 1 } : i
+        i.id === internshipId
+          ? { ...i, applicants: [...i.applicants, applicant] }
+          : i
       )
     );
   }
@@ -112,7 +127,7 @@ export function NGOProvider({ children }: { children: React.ReactNode }) {
         donations: [],
         events: [],
         notifications: [],
-        postInternship,
+        addInternship,
         addApplicant,
       }}
     >
@@ -121,6 +136,18 @@ export function NGOProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+/* ------------------------------------------------------------------
+   HOOK
+------------------------------------------------------------------ */
+
 export function useNGO() {
   return useContext(NGOContext);
+}
+
+export function updateApplicantProgress(id: string, progress: any) {
+  setApplicants(prev =>
+    prev.map(a =>
+      a.id === id ? { ...a, progress } : a
+    )
+  );
 }

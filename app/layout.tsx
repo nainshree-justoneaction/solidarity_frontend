@@ -4,7 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 import ToastProvider from "@/components/ToastProvider";
 import { AuthProvider } from "@/context/AuthContext";
-
+import { SOSButton } from "@/components/sos/sos-button"
 
 const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
@@ -44,6 +44,7 @@ export default function RootLayout({
           <ToastProvider />
           {children}
         </AuthProvider>
+        <SOSButton />
       </body>
     </html>
   )

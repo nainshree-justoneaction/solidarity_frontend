@@ -24,13 +24,18 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
-  { label: "Dashboard", icon: <Home size={20} />, href: "/student/dashboard" },
-  { label: "Profile", icon: <User size={20} />, href: "/student/profile" },
-  { label: "Your Internships", icon: <Briefcase size={20} />, href: "/student/internships" },
-  { label: "Training Modules", icon: <BookOpen size={20} />, href: "/student/training", sdgColor: "#c5192d" },
-  { label: "Reports", icon: <BarChart3 size={20} />, href: "/student/reports" },
-  { label: "Certificates", icon: <Award size={20} />, href: "/student/certificates" },
-  { label: "Notifications", icon: <Bell size={20} />, href: "/student/notifications" },
+  { label: "Dashboard", icon: <Home size={18} />, href: "/student/dashboard" },
+  { label: "Profile", icon: <User size={18} />, href: "/student/profile" },
+  { label: "Your Internships", icon: <Briefcase size={18} />, href: "/student/internships" },
+  {
+    label: "Training Modules",
+    icon: <BookOpen size={18} />,
+    href: "/student/training",
+    sdgColor: "#c5192d",
+  },
+  { label: "Reports", icon: <BarChart3 size={18} />, href: "/student/reports" },
+  { label: "Certificates", icon: <Award size={18} />, href: "/student/certificates" },
+  { label: "Notifications", icon: <Bell size={18} />, href: "/student/notifications" },
 ]
 
 export default function DashboardSidebar() {
@@ -38,71 +43,74 @@ export default function DashboardSidebar() {
   const pathname = usePathname()
   const router = useRouter()
 
-  const handleLogout = () => {
-    // Clear auth session
-    if (typeof window !== "undefined") {
-      sessionStorage.removeItem("auth")
-    }
+  const logout = () => {
+    sessionStorage.removeItem("auth")
     router.push("/auth/login")
   }
 
   return (
     <>
-      {/* Mobile menu button */}
+      {/* MOBILE TOGGLE */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-50 lg:hidden bg-black border border-white p-2"
+        className="fixed top-4 left-4 z-50 lg:hidden
+                   bg-black border border-white/20 p-2 rounded-md"
       >
-        {isOpen ? <X size={24} /> : <Menu size={24} />}
+        {isOpen ? <X size={22} /> : <Menu size={22} />}
       </button>
 
-      {/* Sidebar */}
+      {/* SIDEBAR */}
       <aside
-        className={`w-64 bg-black border-r border-white/10 flex flex-col fixed lg:relative h-full z-40 transform lg:transform-none transition-transform ${
-          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        }`}
+        className={`w-64 bg-black border-r border-white/10
+                    flex flex-col fixed lg:relative h-full z-40
+                    transition-transform ${
+                      isOpen
+                        ? "translate-x-0"
+                        : "-translate-x-full lg:translate-x-0"
+                    }`}
       >
-        {/* Logo */}
-        <div className="p-6 border-b border-white/10">
-          <div className="w-12 h-12 bg-white rounded flex items-center justify-center font-bold text-black text-xl">
-            S
-          </div>
+        {/* LOGO */}
+        <div className="p-6 border-b border-white/10 text-white font-bold">
+          Just One Action
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto p-4 space-y-2">
+        {/* NAV */}
+        <nav className="flex-1 p-4 space-y-1">
           {menuItems.map((item) => {
             const isActive = pathname?.startsWith(item.href)
             return (
               <Link
                 key={item.label}
                 href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded text-white hover:bg-white/5 transition-colors relative ${
-                  isActive ? "bg-white/10 font-semibold" : ""
-                }`}
                 onClick={() => setIsOpen(false)}
+                className={`flex items-center gap-3 px-4 py-3 rounded-md text-sm transition relative ${
+                  isActive
+                    ? "bg-white/10 text-white font-semibold"
+                    : "text-white/70 hover:bg-white/5"
+                }`}
               >
                 {item.sdgColor && (
-                  <div
-                    className="w-2 h-2 rounded-full absolute left-0"
+                  <span
+                    className="absolute left-2 w-2 h-2 rounded-full"
                     style={{ backgroundColor: item.sdgColor }}
                   />
                 )}
-                <span className="text-white">{item.icon}</span>
-                <span className="text-sm">{item.label}</span>
+                {item.icon}
+                {item.label}
               </Link>
             )
           })}
         </nav>
 
-        {/* Logout */}
+        {/* LOGOUT */}
         <div className="p-4 border-t border-white/10">
           <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded text-white hover:bg-white/5 transition-colors"
+            onClick={logout}
+            className="w-full flex items-center gap-3 px-4 py-3
+                       rounded-md text-white/70 hover:bg-white/5 transition"
           >
-            <LogOut size={20} />
-            <span className="text-sm font-medium">Logout</span>
+            <LogOut size={18} />
+            Logout
           </button>
         </div>
       </aside>

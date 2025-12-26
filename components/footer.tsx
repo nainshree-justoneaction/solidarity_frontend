@@ -44,14 +44,14 @@ export function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-center md:text-left">
             <a href="#" className="text-xl font-bold tracking-tight">
-              <span className="text-foreground">just </span>
+              <span className="text-foreground">Just </span>
               <span
                 className="bg-clip-text text-transparent"
                 style={{
                   backgroundImage: "linear-gradient(90deg, #E5243B, #FCC30B, #4C9F38, #26BDE2)",
                 }}
               >
-                one-xtion
+                OneAction
               </span>
             </a>
             <p className="mt-2 text-sm text-muted-foreground">A Parikranti Foundation Initiative</p>

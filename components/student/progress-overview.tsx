@@ -1,68 +1,99 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "react"
 
 interface ProgressCard {
-  label: string;
-  value: number;
-  sdgColor: string;
+  label: string
+  value: number
+  hint: string
 }
 
 export default function ProgressOverview() {
-  const [progressCards, setProgressCards] = useState<ProgressCard[]>([]);
+  const [cards, setCards] = useState<ProgressCard[]>([])
 
   useEffect(() => {
-    const completedData = JSON.parse(sessionStorage.getItem("completedModulesData") || "{}");
-    const completedModules = Object.values(completedData);
+    const completedModules = JSON.parse(
+      sessionStorage.getItem("completedModulesData") || "{}"
+    )
 
-    const inProgressModules = JSON.parse(sessionStorage.getItem("modulesInProgressData") || "[]");
+    const fundraising = JSON.parse(
+      localStorage.getItem("fundraising_completed") || "{}"
+    )
 
-    const cards: ProgressCard[] = [
+    const appliedInternships = JSON.parse(
+      sessionStorage.getItem("appliedInternships") || "[]"
+    )
+
+    const inProgress = JSON.parse(
+      sessionStorage.getItem("modulesInProgressData") || "[]"
+    )
+
+    const trainingHours = Object.values(completedModules).reduce(
+      (acc: number, mod: any) => acc + (mod.hours || 4),
+      0
+    )
+
+    const certificatesEarned = Object.values(fundraising).filter(Boolean).length
+
+    setCards([
       {
-        label: "Internships Completed",
-        value: completedModules.filter((mod: any) => mod.title.toLowerCase().includes("internship")).length,
-        sdgColor: "#e5243b",
+        label: "Internships Applied",
+        value: appliedInternships.length,
+        hint: "Opportunities you've applied for",
       },
       {
         label: "Training Hours",
-        value: completedModules.reduce((acc: number, mod: any) => acc + (mod.hours || 0), 0),
-        sdgColor: "#c5192d",
+        value: trainingHours,
+        hint: "Total learning time invested",
       },
       {
         label: "Modules In Progress",
-        value: inProgressModules.length,
-        sdgColor: "#4c9f38",
+        value: inProgress.length,
+        hint: "Ongoing training modules",
       },
       {
         label: "Certificates Earned",
-        value: completedModules.filter((mod: any) => mod.certified).length,
-        sdgColor: "#0a4a99",
+        value: certificatesEarned,
+        hint: "Unlocked after completion & fundraising",
       },
-    ];
+    ])
+  }, [])
 
-    setProgressCards(cards);
-  }, []);
-
-  if (progressCards.length === 0) return <p className="text-white">No progress yet.</p>;
+  if (cards.length === 0) {
+    return (
+      <p className="text-white/60 text-center mt-10">
+        No progress recorded yet.
+      </p>
+    )
+  }
 
   return (
-    <section className="animate-fade-in">
-      <h2 className="text-xl font-bold text-white mb-6">Your Progress Overview</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {progressCards.map((card, index) => (
+    <section className="space-y-6">
+      <h2 className="text-xl font-bold text-white">
+        Your Progress Overview
+      </h2>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {cards.map((card, index) => (
           <div
             key={card.label}
-            className="bg-black border border-white/10 rounded p-6 hover:border-white/20 transition-colors animate-slide-up"
-            style={{ animationDelay: `${index * 100}ms` }}
+            className="
+              bg-black border border-white/10 rounded-xl p-6
+              hover:border-white/20 transition-colors
+            "
           >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: card.sdgColor }} />
-              <p className="text-cfcfcf text-sm">{card.label}</p>
-            </div>
-            <p className="text-3xl font-bold text-white">{card.value}</p>
+            <p className="text-white/60 text-sm">{card.label}</p>
+
+            <p className="text-3xl font-bold text-white mt-2">
+              {card.value}
+            </p>
+
+            <p className="text-white/40 text-xs mt-1">
+              {card.hint}
+            </p>
           </div>
         ))}
       </div>
     </section>
-  );
+  )
 }

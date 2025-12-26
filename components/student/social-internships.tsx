@@ -1,50 +1,121 @@
-"use client"
+"use client";
 
-import { ArrowRight } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
-import { internships as allInternships, Internship as InternshipType } from "@/data/internships"
+import { ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import {
+  internships as allInternships,
+  Internship as InternshipType,
+} from "@/data/internships";
+
+/* ---------------------------------------------
+   COMPONENT
+--------------------------------------------- */
 
 export default function SocialInternships() {
-  const router = useRouter()
-  const [selectedInterests, setSelectedInterests] = useState<string[]>([])
-  const [filteredInternships, setFilteredInternships] = useState<InternshipType[]>([])
-  const [visibleCount, setVisibleCount] = useState(6) // initially 6 dikhayenge
+  const router = useRouter();
 
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [filteredInternships, setFilteredInternships] = useState<
+    InternshipType[]
+  >([]);
+  const [visibleCount, setVisibleCount] = useState(6);
+
+  // 🔥 FIX: training completion MUST be reactive
+  const [trainingDone, setTrainingDone] = useState(false);
+
+  /* ---------------------------------------------
+     CHECK TRAINING COMPLETION (REAL SOURCE)
+  --------------------------------------------- */
   useEffect(() => {
-    const registration = JSON.parse(sessionStorage.getItem("registration") || "{}")
-    const interests = registration.step3?.interests || []
-    setSelectedInterests(interests)
+    const checkTraining = () => {
+      const fundraising = JSON.parse(
+        localStorage.getItem("fundraising_completed") || "{}"
+      );
 
-    const filtered = allInternships.filter((i) => interests.includes(i.domain))
-    setFilteredInternships(filtered)
-  }, [])
+      // if ANY module fundraising is completed → unlock internships
+      const completed = Object.values(fundraising).some(Boolean);
+      setTrainingDone(completed);
+    };
 
+    checkTraining(); // initial check
+
+    // re-check when user returns to this tab/page
+    window.addEventListener("focus", checkTraining);
+
+    return () => {
+      window.removeEventListener("focus", checkTraining);
+    };
+  }, []);
+
+  /* ---------------------------------------------
+     LOAD INTERESTS + FILTER INTERNSHIPS
+  --------------------------------------------- */
+  useEffect(() => {
+    const registration = JSON.parse(
+      sessionStorage.getItem("registration") || "{}"
+    );
+
+    const interests = registration.step3?.interests || [];
+    setSelectedInterests(interests);
+
+    const filtered = allInternships.filter((i) =>
+      interests.includes(i.domain)
+    );
+
+    setFilteredInternships(filtered);
+  }, []);
+
+  /* ---------------------------------------------
+     APPLY HANDLER
+  --------------------------------------------- */
   const handleApply = (id: string) => {
-    const paid = localStorage.getItem("solidarity_paid") === "true"
-    if (!paid) {
-      router.push("/payment")
-      return
+    if (!trainingDone) {
+      router.push("/student/training");
+      return;
     }
-    router.push(`/student/internships/${id}`)
-  }
 
+    router.push(`/student/internships/${id}`);
+  };
+
+  /* ---------------------------------------------
+     EMPTY STATE
+  --------------------------------------------- */
   if (selectedInterests.length === 0) {
     return (
       <section className="animate-fade-in">
-        <h2 className="text-xl font-bold text-white mb-6">Available Social Internships</h2>
-        <p className="text-white/70">Select your interests during registration to see relevant internships here.</p>
+        <h2 className="text-xl font-bold text-white mb-6">
+          Available Social Internships
+        </h2>
+        <p className="text-white/70">
+          Select your interests during registration to see relevant internships
+          here.
+        </p>
       </section>
-    )
+    );
   }
 
-  const visibleInternships = filteredInternships.slice(0, visibleCount)
-  const hasMore = visibleCount < filteredInternships.length
+  const visibleInternships = filteredInternships.slice(0, visibleCount);
+  const hasMore = visibleCount < filteredInternships.length;
 
+  /* ---------------------------------------------
+     UI
+  --------------------------------------------- */
   return (
-    <section className="animate-fade-in">
-      <h2 className="text-xl font-bold text-white mb-6">Available Social Internships</h2>
+    <section className="animate-fade-in space-y-6">
+      <h2 className="text-xl font-bold text-white">
+        Available Social Internships
+      </h2>
 
+      {/* TRAINING GATE MESSAGE */}
+      {!trainingDone && (
+        <div className="p-4 rounded-lg border border-yellow-400/30 bg-yellow-400/10 text-yellow-300 text-sm">
+          ⚠️ You must complete at least <b>one training module</b> (including
+          fundraising) before applying for social internships.
+        </div>
+      )}
+
+      {/* INTERNSHIP GRID */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {visibleInternships.map((internship, index) => (
           <div
@@ -59,21 +130,38 @@ export default function SocialInternships() {
               {internship.icon}
             </div>
 
-            <h3 className="text-white font-semibold mb-1">{internship.title}</h3>
-            <p className="text-white/60 text-sm mb-1">{internship.ngoName}</p>
-            <p className="text-cfcfcf text-sm mb-4">{internship.description}</p>
+            <h3 className="text-white font-semibold mb-1">
+              {internship.title}
+            </h3>
+            <p className="text-white/60 text-sm mb-1">
+              {internship.ngoName}
+            </p>
+            <p className="text-cfcfcf text-sm mb-4">
+              {internship.description}
+            </p>
 
+            {/* APPLY BUTTON */}
             <button
+              disabled={!trainingDone}
               onClick={() => handleApply(internship.id)}
-              className="w-full bg-white text-black font-medium py-2 rounded flex items-center justify-center gap-2 hover:bg-white/90 transition-colors group"
+              className={`
+                w-full py-2 rounded flex items-center justify-center gap-2
+                font-medium transition-colors
+                ${
+                  trainingDone
+                    ? "bg-white text-black hover:bg-white/90"
+                    : "bg-white/10 text-white/40 cursor-not-allowed"
+                }
+              `}
             >
-              Apply Now
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              {trainingDone ? "Apply Now" : "Complete Training to Apply"}
+              <ArrowRight size={16} />
             </button>
           </div>
         ))}
       </div>
 
+      {/* LOAD MORE */}
       {hasMore && (
         <div className="flex justify-center mt-6">
           <button
@@ -85,5 +173,5 @@ export default function SocialInternships() {
         </div>
       )}
     </section>
-  )
+  );
 }

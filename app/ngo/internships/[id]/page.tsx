@@ -1,138 +1,212 @@
 "use client";
-import { useContext, useMemo, useState } from "react";
-import { NGOContext } from "@/context/NgoContext"; 
-import ApplicantCard from "@/components/ngo/ApplicantCard";
-import StudentProfileModal from "@/components/ngo/StudentProfileModal";
-import { useRouter, useParams } from "next/navigation";
+
+import { useParams, useRouter } from "next/navigation";
+import { useNGO } from "@/context/NgoContext";
+import { useMemo, useState } from "react";
+import { ArrowLeft, Users } from "lucide-react";
+
+/* -------------------------------------------------- */
 
 export default function InternshipDetailPage() {
-  const params = useParams();
-  const id = params?.id;
+  const { id } = useParams();
   const router = useRouter();
+  const { internships } = useNGO();
 
-  const { state, setState } = useContext(NGOContext);
-
-  // ---- SAFE FETCHING ----
-  const internship = useMemo(() => {
-    return state?.internships?.find((i: any) => String(i.id) === String(id)) || null;
-  }, [state.internships, id]);
-
-  const applications = useMemo(() => {
-    return state?.applications?.filter((a: any) => String(a.internshipId) === String(id)) || [];
-  }, [state.applications, id]);
+  const internship = useMemo(
+    () => internships.find((i) => String(i.id) === String(id)),
+    [internships, id]
+  );
 
   const [selectedStudent, setSelectedStudent] = useState<any | null>(null);
 
   if (!internship) {
     return (
-      <div className="text-zinc-400">
-        Internship not found or not loaded.
+      <div className="p-10 text-white/60">
+        Internship not found.
       </div>
     );
   }
 
-  // ---- SELECT HANDLER ----
-  function handleSelect(app: any) {
-    const updatedApps = state.applications.map((x: any) =>
-      x.id === app.id ? { ...x, status: "selected" } : x
-    );
-
-    const selectedEntry = {
-      ...app,
-      selectedAt: new Date().toISOString(),
-    };
-
-    const newSelectedInterns = [
-      ...(state.selectedInterns || []),
-      selectedEntry,
-    ];
-
-    setState({
-      ...state,
-      applications: updatedApps,
-      selectedInterns: newSelectedInterns,
-    });
-
-    alert("Student selected. Track them from the Track page.");
-  }
-
-  // ---- REJECT HANDLER ----
-  function handleReject(app: any) {
-    const updatedApps = state.applications.map((x: any) =>
-      x.id === app.id ? { ...x, status: "rejected" } : x
-    );
-
-    setState({ ...state, applications: updatedApps });
-  }
+  const applicants = internship.applicants || [];
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="px-8 py-10 space-y-10 text-white">
+
+      {/* ================= HEADER ================= */}
+      <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">{internship.title}</h1>
-          <p className="text-zinc-400 text-sm">{internship.description}</p>
+          <button
+            onClick={() => router.push("/ngo/internships")}
+            className="flex items-center gap-2 text-white/60 hover:text-white mb-3"
+          >
+            <ArrowLeft size={16} />
+            Back to internships
+          </button>
+
+          <h1 className="text-3xl font-bold">
+            {internship.title}
+          </h1>
+
+          <p className="text-white/60 mt-2 max-w-2xl">
+            {internship.description || "No description provided."}
+          </p>
         </div>
+
+        <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-2 rounded-xl">
+          <Users size={18} className="text-[#00ADEF]" />
+          <span className="font-semibold">{applicants.length}</span>
+          <span className="text-white/60 text-sm">Applicants</span>
+        </div>
+      </div>
+
+      {/* ================= CONTENT ================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        {/* ================= APPLICANTS ================= */}
+        <div className="lg:col-span-2 space-y-4">
+          <h2 className="text-xl font-semibold">
+            Applicants
+          </h2>
+
+          {applicants.length === 0 ? (
+            <EmptyApplicants />
+          ) : (
+            <div className="space-y-4">
+              {applicants.map((app: any) => (
+                <ApplicantCard
+                  key={app.id}
+                  applicant={app}
+                  onView={() => setSelectedStudent(app)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* ================= SIDEBAR ================= */}
+        <div className="bg-[#0b0b0b] border border-white/10 rounded-2xl p-6 space-y-4">
+          <h3 className="font-semibold text-lg">
+            Internship Info
+          </h3>
+
+          <Info label="Location" value={internship.location || "Not specified"} />
+          <Info label="Mode" value={internship.mode || "N/A"} />
+          <Info
+            label="Skills"
+            value={
+              internship.requiredSkills?.join(", ") || "Not specified"
+            }
+          />
+          <Info label="Status" value={internship.status || "Open"} />
+        </div>
+      </div>
+
+      {/* ================= MODAL ================= */}
+      {selectedStudent && (
+        <StudentProfileModal
+          student={selectedStudent}
+          onClose={() => setSelectedStudent(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+/* -------------------------------------------------- */
+/* COMPONENTS */
+/* -------------------------------------------------- */
+
+function ApplicantCard({
+  applicant,
+  onView,
+}: {
+  applicant: any;
+  onView: () => void;
+}) {
+  return (
+    <div className="
+      bg-gradient-to-br from-[#0f0f0f] to-[#0b0b0b]
+      border border-white/10 rounded-2xl p-6
+      flex items-center justify-between
+      hover:border-white/20 transition
+    ">
+      <div>
+        <p className="font-semibold">
+          {applicant.fullName}
+        </p>
+        <p className="text-white/60 text-sm">
+          {applicant.email}
+        </p>
+      </div>
+
+      <div className="flex gap-2">
         <button
-          onClick={() => router.push("/ngo/internships")}
-          className="text-zinc-300"
+          onClick={onView}
+          className="px-4 py-2 rounded-lg border border-white/20 text-white/80 hover:bg-white/5"
         >
-          Back
+          View
+        </button>
+
+        <button
+          className="px-4 py-2 rounded-lg bg-[#00ADEF] text-black font-medium hover:bg-[#00c7ff]"
+        >
+          Shortlist
         </button>
       </div>
+    </div>
+  );
+}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Applicants */}
-        <div className="lg:col-span-2 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-white font-semibold">
-              Applicants ({applications.length})
-            </h3>
-            <div className="text-zinc-400 text-sm">
-              Select candidates to onboard
-            </div>
-          </div>
+function Info({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-xs text-white/40">{label}</p>
+      <p className="text-sm text-white">{value}</p>
+    </div>
+  );
+}
 
-          <div className="space-y-3">
-            {applications.length === 0 && (
-              <div className="text-zinc-400">No applicants yet.</div>
-            )}
+function EmptyApplicants() {
+  return (
+    <div className="bg-white/5 border border-white/10 rounded-3xl p-12 text-center">
+      <h3 className="text-xl font-semibold mb-2">
+        No applicants yet
+      </h3>
+      <p className="text-white/60">
+        Students who apply to this internship will appear here.
+      </p>
+    </div>
+  );
+}
 
-            {applications.map((app: any) => (
-              <ApplicantCard
-                key={app.id}
-                application={app}
-                student={app.student}
-                onView={() => setSelectedStudent(app.student)}
-                onSelect={() => handleSelect(app)}
-                onReject={() => handleReject(app)}
-              />
-            ))}
-          </div>
-        </div>
+/* -------------------------------------------------- */
 
-        {/* Internship Info */}
-        <div className="space-y-4 bg-[#0F0F0F] border border-[#202020] rounded-xl p-4">
-          <h4 className="text-white font-semibold">Internship Info</h4>
-          <div className="text-zinc-300 text-sm">
-            Location: {internship.location || "Not specified"}
-          </div>
-          <div className="text-zinc-300 text-sm">
-            Mode: {internship.mode || "N/A"}
-          </div>
-          <div className="text-zinc-300 text-sm">
-            Skills: {(internship.requiredSkills || []).join(", ") || "N/A"}
-          </div>
-          <div className="text-zinc-300 text-sm">
-            Applicants: {applications.length}
-          </div>
+function StudentProfileModal({
+  student,
+  onClose,
+}: {
+  student: any;
+  onClose: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+      <div className="bg-[#0b0b0b] border border-white/10 rounded-2xl p-8 w-full max-w-lg">
+        <h2 className="text-xl font-semibold mb-2">
+          {student.fullName}
+        </h2>
+        <p className="text-white/60 mb-6">
+          {student.email}
+        </p>
+
+        <div className="flex justify-end">
+          <button
+            onClick={onClose}
+            className="px-5 py-2 bg-white text-black rounded-lg font-medium"
+          >
+            Close
+          </button>
         </div>
       </div>
-
-      <StudentProfileModal
-        student={selectedStudent}
-        onClose={() => setSelectedStudent(null)}
-      />
     </div>
   );
 }

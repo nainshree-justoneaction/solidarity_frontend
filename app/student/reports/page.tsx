@@ -9,171 +9,245 @@ import {
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
-  Cell,
 } from "recharts"
-import TooltipLib from "rc-tooltip"
-import "rc-tooltip/assets/bootstrap.css"
+
+/* ---------------- TYPES ---------------- */
 
 interface ModuleData {
   id: string
   title: string
   completedCount?: number
   total?: number
-  certified?: boolean
-  hours?: number
 }
 
-interface Training {
-  id: string
-  title: string
-  status: "Applied" | "Completed"
-  date: string 
+interface ChartItem {
+  name: string
+  value: number
+  fill: string
 }
+
+interface Activity {
+  date: string // yyyy-mm-dd
+  type: "Applied" | "Completed"
+}
+
+/* ---------------- PAGE ---------------- */
 
 export default function ReportsPage() {
-  const [appliedTrainings, setAppliedTrainings] = useState<string[]>([])
-  const [completedModules, setCompletedModules] = useState<string[]>([])
+  const [chartData, setChartData] = useState<ChartItem[]>([])
   const [modulesInProgress, setModulesInProgress] = useState<ModuleData[]>([])
-  const [chartData, setChartData] = useState<{ status: string; count: number }[]>([])
-  const [trainings, setTrainings] = useState<Training[]>([])
+  const [activities, setActivities] = useState<Activity[]>([])
 
-  const statusColors: Record<string, string> = {
-    Applied: "#FACC15",
-    "In Progress": "#FBBF24",
-    Completed: "#10B981",
-  }
-
+  /* ---------------- LOAD DATA ---------------- */
   useEffect(() => {
-    const applied = JSON.parse(sessionStorage.getItem("appliedInternships") || "[]")
-    const completed = JSON.parse(sessionStorage.getItem("completedModules") || "[]")
-    const inProgress = JSON.parse(sessionStorage.getItem("modulesInProgressData") || "[]")
+    const applied = JSON.parse(
+      sessionStorage.getItem("appliedInternships") || "[]"
+    )
 
-    setAppliedTrainings(applied)
-    setCompletedModules(completed)
-    setModulesInProgress(inProgress)
+    const completedModules = JSON.parse(
+      sessionStorage.getItem("completedModulesData") || "{}"
+    )
+
+    const inProgress = JSON.parse(
+      sessionStorage.getItem("modulesInProgressData") || "[]"
+    )
 
     setChartData([
-      { status: "Applied", count: applied.length },
-      { status: "In Progress", count: inProgress.length },
-      { status: "Completed", count: completed.length },
+      { name: "Applied", value: applied.length, fill: "#FACC15" },
+      { name: "In Progress", value: inProgress.length, fill: "#60A5FA" },
+      {
+        name: "Completed",
+        value: Object.keys(completedModules).length,
+        fill: "#10B981",
+      },
     ])
 
-    const allTrainings: Training[] = []
+    setModulesInProgress(inProgress)
 
-    applied.forEach((id, idx) => {
-      allTrainings.push({
-        id,
-        title: `Training #${id}`,
-        status: "Applied",
-        date: `2025-12-${String(5 + idx).padStart(2, "0")}`,
+    /* Fake activity timeline (demo friendly) */
+    const activityList: Activity[] = []
+    applied.forEach((_: any, i: number) => {
+      activityList.push({
+        date: `2025-12-${String(5 + i).padStart(2, "0")}`,
+        type: "Applied",
       })
     })
 
-    completed.forEach((id, idx) => {
-      allTrainings.push({
-        id,
-        title: `Training #${id}`,
-        status: "Completed",
-        date: `2025-12-${String(10 + idx).padStart(2, "0")}`,
+    Object.keys(completedModules).forEach((_, i) => {
+      activityList.push({
+        date: `2025-12-${String(15 + i).padStart(2, "0")}`,
+        type: "Completed",
       })
     })
 
-    setTrainings(allTrainings)
+    setActivities(activityList)
   }, [])
 
-  const daysInMonth = 31
-  const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+  /* ---------------- HELPERS ---------------- */
 
-  const getTrainingsByDay = (day: number) => {
-    const dayStr = String(day).padStart(2, "0")
-    return trainings.filter(t => t.date.endsWith(`-${dayStr}`))
+  const daysInMonth = 31
+  const getDayActivity = (day: number) => {
+    const d = String(day).padStart(2, "0")
+    return activities.filter((a) => a.date.endsWith(`-${d}`))
   }
 
-  return (
-    <div className="space-y-10 p-4 sm:p-8">
-      <h1 className="text-4xl font-bold text-white mb-4">Reports</h1>
+  /* ---------------- UI ---------------- */
 
-      {/* Summary Cards */}
+  return (
+    <div className="max-w-7xl mx-auto px-6 py-10 space-y-16">
+
+      {/* HEADER */}
+      <div>
+        <h1 className="text-4xl font-bold text-white">Reports & Progress</h1>
+        <p className="text-white/60 mt-2">
+          Your learning, consistency, and impact overview
+        </p>
+      </div>
+
+      {/* KPI CARDS */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         {chartData.map((item) => (
           <div
-            key={item.status}
-            className="bg-gradient-to-br from-white/10 to-white/5 p-6 rounded-2xl shadow-lg border border-white/10 flex flex-col items-center justify-center hover:scale-105 transform transition"
+            key={item.name}
+            className="rounded-2xl bg-gradient-to-br from-white/10 to-white/5
+                       p-6 border border-white/10"
           >
-            <p className="text-white/70">{item.status}</p>
-            <p className="text-3xl font-bold mt-2">{item.count}</p>
+            <p className="text-white/60 text-sm">{item.name}</p>
+            <p className="text-4xl font-bold text-white mt-1">
+              {item.value}
+            </p>
           </div>
         ))}
       </div>
 
-      {/* Bar Chart */}
-      <div className="bg-white/5 p-6 rounded-2xl shadow-lg border border-white/10">
-        <h2 className="text-2xl font-semibold mb-4 text-white">Training Status Distribution</h2>
-        <ResponsiveContainer width="100%" height={350}>
-          <BarChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }} barCategoryGap="30%">
-            <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
-            <XAxis dataKey="status" stroke="#ffffff80" tick={{ fill: "#ffffffcc", fontSize: 14 }} />
-            <YAxis stroke="#ffffff80" tick={{ fill: "#ffffffcc", fontSize: 14 }} allowDecimals={false} />
-            <Tooltip contentStyle={{ backgroundColor: "#111", border: "none", borderRadius: 8 }} itemStyle={{ color: "#fff" }} />
-            <Bar dataKey="count" radius={[8, 8, 0, 0]} barSize={40} isAnimationActive>
-              {chartData.map((entry) => (
-                <Cell key={entry.status} fill={statusColors[entry.status]} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+      {/* ANALYTICS + INSIGHT */}
+      <div className="grid lg:grid-cols-3 gap-10">
+
+        {/* BAR CHART */}
+        <div className="lg:col-span-2 bg-white/5 p-8 rounded-3xl border border-white/10">
+          <h2 className="text-2xl font-semibold text-white mb-6">
+            Training Status Overview
+          </h2>
+
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={chartData} barCategoryGap="35%">
+              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
+              <XAxis dataKey="name" tick={{ fill: "#fff" }} />
+              <YAxis tick={{ fill: "#fff" }} allowDecimals={false} />
+              <Tooltip
+                contentStyle={{
+                  background: "#0f172a",
+                  borderRadius: 10,
+                  border: "none",
+                  color: "#fff",
+                }}
+              />
+              <Bar dataKey="value" radius={[10, 10, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* INSIGHTS */}
+        <div className="bg-gradient-to-br from-[#00ADEF]/20 to-[#00ADEF]/5
+                        border border-[#00ADEF]/30 rounded-3xl p-8">
+          <h3 className="text-xl font-semibold text-white mb-4">
+            📌 Key Insights
+          </h3>
+          <ul className="space-y-3 text-white/80 text-sm">
+            <li>• Consistent participation improves internship access</li>
+            <li>• Fundraising unlocks certification eligibility</li>
+            <li>• Completing modules increases credibility score</li>
+          </ul>
+        </div>
       </div>
 
-      {/* Premium Calendar */}
-      <div className="bg-white/5 p-6 rounded-2xl shadow-lg border border-white/10">
-        <h2 className="text-2xl font-semibold mb-4 text-white">Your Training Timeline</h2>
-        <div className="grid grid-cols-7 gap-1 text-white/70 font-semibold text-center mb-2">
-          {weekdays.map(day => <div key={day}>{day}</div>)}
-        </div>
-        <div className="grid grid-cols-7 gap-1">
-          {Array.from({ length: daysInMonth }).map((_, idx) => {
-            const dayNum = idx + 1
-            const dayTrainings = getTrainingsByDay(dayNum)
+      {/* ACTIVITY CALENDAR */}
+      <div className="bg-white/5 p-8 rounded-3xl border border-white/10">
+        <h2 className="text-2xl font-semibold text-white mb-2">
+          Learning Activity Calendar
+        </h2>
+        <p className="text-white/60 text-sm mb-6">
+          Days you applied, studied, or completed training
+        </p>
+
+        <div className="grid grid-cols-7 gap-2">
+          {Array.from({ length: daysInMonth }).map((_, i) => {
+            const day = i + 1
+            const acts = getDayActivity(day)
+
+            let bg = "bg-white/10"
+            if (acts.length === 1) bg = "bg-yellow-400/40"
+            if (acts.length > 1) bg = "bg-green-500/60"
+
             return (
               <div
-                key={dayNum}
-                className="h-24 p-2 border border-white/10 rounded-lg flex flex-col justify-start hover:shadow-lg hover:scale-105 transform transition relative bg-white/5"
+                key={day}
+                className={`h-10 rounded-lg flex items-center justify-center
+                            text-xs font-semibold text-white
+                            transition hover:scale-110 ${bg}`}
+                title={
+                  acts.length
+                    ? `${acts.length} activity(s)`
+                    : "No activity"
+                }
               >
-                <div className="text-white/80 font-semibold mb-1">{dayNum}</div>
-                <div className="flex flex-col gap-1">
-                  {dayTrainings.map((t) => (
-                    <TooltipLib key={t.id} placement="top" overlay={t.title}>
-                      <span
-                        className={`text-xs px-1 rounded cursor-pointer ${
-                          t.status === "Applied" ? "bg-yellow-400 text-black" : "bg-green-500 text-white"
-                        }`}
-                      >
-                        {t.status}
-                      </span>
-                    </TooltipLib>
-                  ))}
-                </div>
+                {day}
               </div>
             )
           })}
         </div>
-        <p className="text-white/60 mt-2 text-sm">
-          Yellow: Applied &nbsp; | &nbsp; Green: Completed
-        </p>
+
+        <div className="flex gap-6 mt-6 text-xs text-white/70">
+          <div className="flex items-center gap-2">
+            <span className="w-4 h-4 rounded bg-white/10" />
+            No activity
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-4 h-4 rounded bg-yellow-400/40" />
+            Applied / Started
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-4 h-4 rounded bg-green-500/60" />
+            Completed
+          </div>
+        </div>
       </div>
 
-      {/* Modules in Progress */}
-      <div className="bg-white/5 p-6 rounded-2xl shadow-lg border border-white/10">
-        <h2 className="text-2xl font-semibold mb-4 text-white">Modules In Progress</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {modulesInProgress.map((module) => (
-            <div key={module.id} className="bg-white/10 p-4 rounded-xl flex flex-col justify-between border border-white/10">
-              <p className="text-white font-semibold">{module.title}</p>
-              <p className="text-white/70 text-sm">
-                Progress: {module.completedCount || 0}/{module.total || 0} modules
-              </p>
-            </div>
-          ))}
+      {/* MODULE PROGRESS */}
+      <div className="bg-white/5 p-8 rounded-3xl border border-white/10">
+        <h2 className="text-2xl font-semibold text-white mb-6">
+          Modules In Progress
+        </h2>
+
+        {modulesInProgress.length === 0 && (
+          <p className="text-white/60">
+            No modules currently in progress.
+          </p>
+        )}
+
+        <div className="space-y-5">
+          {modulesInProgress.map((mod) => {
+            const percent =
+              mod.total && mod.completedCount
+                ? Math.round((mod.completedCount / mod.total) * 100)
+                : 0
+
+            return (
+              <div key={mod.id} className="space-y-2">
+                <div className="flex justify-between text-sm text-white">
+                  <span>{mod.title}</span>
+                  <span>{percent}%</span>
+                </div>
+
+                <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-[#00ADEF] transition-all"
+                    style={{ width: `${percent}%` }}
+                  />
+                </div>
+              </div>
+            )
+          })}
         </div>
       </div>
     </div>

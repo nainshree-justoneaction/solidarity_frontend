@@ -1,162 +1,287 @@
 "use client";
-import React, { useState, useEffect } from "react";
+
+import { useEffect, useState } from "react";
+import {
+  Calendar,
+  Users,
+  Bell,
+  Plus,
+  MapPin,
+  Activity,
+} from "lucide-react";
+
+/* ---------------- TYPES ---------------- */
+
+interface EventItem {
+  id: string;
+  title: string;
+  date: string;
+  location: string;
+  volunteersNeeded: number;
+  volunteersJoined: number;
+  sdg: string;
+}
+
+interface Notification {
+  id: string;
+  text: string;
+  date: string;
+}
+
+/* ---------------- PAGE ---------------- */
 
 export default function EventsPage() {
-  const [events, setEvents] = useState<any[]>([]);
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [events, setEvents] = useState<EventItem[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
-  const [vols, setVols] = useState(10);
-  const [sdg, setSdg] = useState("bg-sdg11");
+  const [location, setLocation] = useState("");
+  const [vols, setVols] = useState(20);
+  const [sdg, setSdg] = useState("SDG 11");
 
-  // Load from localStorage (client-only)
+  /* ---------------- LOAD ---------------- */
+
   useEffect(() => {
-    const storedEvents = localStorage.getItem("events");
-    if (storedEvents) setEvents(JSON.parse(storedEvents));
-
-    const storedNotifications = localStorage.getItem("eventNotifications");
-    if (storedNotifications) setNotifications(JSON.parse(storedNotifications));
+    const e = localStorage.getItem("ngo_events");
+    const n = localStorage.getItem("ngo_event_notifications");
+    if (e) setEvents(JSON.parse(e));
+    if (n) setNotifications(JSON.parse(n));
   }, []);
 
-  // Save to localStorage whenever state changes
   useEffect(() => {
-    localStorage.setItem("events", JSON.stringify(events));
+    localStorage.setItem("ngo_events", JSON.stringify(events));
   }, [events]);
 
   useEffect(() => {
-    localStorage.setItem("eventNotifications", JSON.stringify(notifications));
+    localStorage.setItem(
+      "ngo_event_notifications",
+      JSON.stringify(notifications)
+    );
   }, [notifications]);
 
+  /* ---------------- ACTIONS ---------------- */
+
   function createEvent() {
-    if (!title || !date) {
-      alert("Title and date required");
-      return;
-    }
-    const next = {
+    if (!title || !date || !location) return alert("Fill all fields");
+
+    const ev: EventItem = {
       id: `ev-${Date.now()}`,
       title,
       date,
+      location,
       volunteersNeeded: vols,
+      volunteersJoined: Math.floor(vols * 0.45), // demo realism
       sdg,
     };
-    setEvents((prev) => [next, ...prev]);
+
+    setEvents((p) => [ev, ...p]);
     setTitle("");
     setDate("");
-    setVols(10);
+    setLocation("");
+    setVols(20);
   }
 
-  function notifyAll(ev: any) {
-    const note = {
+  function notify(ev: EventItem) {
+    const note: Notification = {
       id: `n-${Date.now()}`,
-      text: `Reminder: ${ev.title} on ${ev.date}`,
+      text: `Volunteers notified for "${ev.title}"`,
       date: new Date().toLocaleString(),
-      eventId: ev.id,
     };
-    setNotifications((prev) => [note, ...prev]);
-    alert("Notification simulated (saved locally).");
+    setNotifications((p) => [note, ...p]);
   }
 
-  function removeEvent(id: string) {
-    setEvents((prev) => prev.filter((e) => e.id !== id));
-  }
+  /* ---------------- STATS ---------------- */
+
+  const totalVolunteers = events.reduce(
+    (a, e) => a + e.volunteersJoined,
+    0
+  );
+
+  /* ---------------- UI ---------------- */
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Events & CSR</h1>
-      </div>
+    <div className="space-y-16 px-10 py-10 text-white">
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2">
-          <div className="space-y-4">
-            {events.length === 0 && (
-              <div className="text-zinc-400">No events planned.</div>
-            )}
-            {events.map((ev) => (
+      {/* ================= HERO ================= */}
+      <section className="grid lg:grid-cols-2 gap-12 items-center">
+        <div>
+          <h1 className="text-5xl font-bold leading-tight">
+            Orchestrating <br /> Real-World Impact
+          </h1>
+          <p className="text-white/60 mt-4 max-w-xl">
+            Plan, manage, and scale community events with structured execution
+            and measurable participation.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-6">
+          <Stat label="Events Organized" value={events.length} />
+          <Stat label="Volunteers Mobilized" value={totalVolunteers} />
+          <Stat label="SDGs Impacted" value="5" />
+          <Stat label="Engagement Rate" value="92%" />
+        </div>
+      </section>
+
+      {/* ================= ACTIVE EVENTS ================= */}
+      <section>
+        <h2 className="text-2xl font-semibold mb-6">
+          Active & Upcoming Events
+        </h2>
+
+        {events.length === 0 && (
+          <div className="bg-white/5 border border-white/10 rounded-3xl p-12 text-center">
+            <p className="text-white/60">
+              No events created yet. Start your first initiative.
+            </p>
+          </div>
+        )}
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {events.map((ev) => {
+            const progress = Math.round(
+              (ev.volunteersJoined / ev.volunteersNeeded) * 100
+            );
+
+            return (
               <div
                 key={ev.id}
-                className="bg-[#0F0F0F] border border-[#202020] rounded-lg p-4 flex justify-between items-center"
+                className="bg-[#0f172a] border border-white/10 rounded-3xl p-6 space-y-4"
               >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="text-lg font-semibold">{ev.title}</h3>
+                    <p className="text-white/60 text-sm flex items-center gap-2">
+                      <Calendar size={14} /> {ev.date}
+                    </p>
+                    <p className="text-white/60 text-sm flex items-center gap-2">
+                      <MapPin size={14} /> {ev.location}
+                    </p>
+                  </div>
+
+                  <span className="text-xs px-3 py-1 rounded-full bg-white/10">
+                    {ev.sdg}
+                  </span>
+                </div>
+
+                {/* Progress */}
                 <div>
-                  <div className="text-white font-semibold">{ev.title}</div>
-                  <div className="text-zinc-400 text-sm">
-                    {ev.date} • {ev.volunteersNeeded} volunteers
+                  <div className="flex justify-between text-xs text-white/60 mb-1">
+                    <span>
+                      {ev.volunteersJoined}/{ev.volunteersNeeded} Volunteers
+                    </span>
+                    <span>{progress}%</span>
+                  </div>
+                  <div className="w-full h-2 bg-white/10 rounded-full">
+                    <div
+                      className="h-full bg-[#00ADEF] rounded-full"
+                      style={{ width: `${progress}%` }}
+                    />
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => notifyAll(ev)}
-                    className="px-3 py-1 bg-white text-black rounded-md"
-                  >
-                    Notify
-                  </button>
-                  <button
-                    onClick={() => removeEvent(ev.id)}
-                    className="px-3 py-1 text-rose-400"
-                  >
-                    Remove
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
 
+                <button
+                  onClick={() => notify(ev)}
+                  className="text-sm text-[#00ADEF] hover:underline flex items-center gap-2"
+                >
+                  <Bell size={14} /> Notify Volunteers
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ================= CREATE EVENT ================= */}
+      <section className="grid lg:grid-cols-2 gap-12">
         <div>
-          <div className="bg-[#0F0F0F] border border-[#202020] rounded-lg p-4">
-            <h4 className="text-white font-semibold mb-3">Create Event</h4>
-            <div className="space-y-3">
-              <input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Title"
-                className="w-full bg-black border border-zinc-800 rounded px-3 py-2 text-white"
-              />
-              <input
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                type="date"
-                className="w-full bg-black border border-zinc-800 rounded px-3 py-2 text-white"
-              />
-              <input
-                value={vols}
-                onChange={(e) => setVols(Number(e.target.value))}
-                type="number"
-                className="w-full bg-black border border-zinc-800 rounded px-3 py-2 text-white"
-              />
-              <select
-                value={sdg}
-                onChange={(e) => setSdg(e.target.value)}
-                className="w-full bg-black border border-zinc-800 rounded px-3 py-2 text-white"
-              >
-                <option value="bg-sdg11">Sustainable Cities (SDG 11)</option>
-                <option value="bg-sdg14">Life Below Water (SDG 14)</option>
-                <option value="bg-sdg6">Clean Water (SDG 6)</option>
-                <option value="bg-sdg17">Partnerships (SDG 17)</option>
-              </select>
-              <button
-                onClick={createEvent}
-                className="w-full bg-white text-black px-3 py-2 rounded-md"
-              >
-                Create Event
-              </button>
-            </div>
-          </div>
-
-          <div className="mt-4 bg-[#0F0F0F] border border-[#202020] rounded-lg p-4">
-            <h4 className="text-white font-semibold mb-3">Notifications</h4>
-            {notifications.length === 0 && (
-              <div className="text-zinc-400">No notifications yet.</div>
-            )}
-            {notifications.map((n) => (
-              <div key={n.id} className="p-2 bg-black/30 rounded mb-2">
-                <div className="text-zinc-300 text-sm">{n.date}</div>
-                <div className="text-white">{n.text}</div>
-              </div>
-            ))}
-          </div>
+          <h2 className="text-2xl font-semibold mb-2">
+            Launch a New Event
+          </h2>
+          <p className="text-white/60 text-sm max-w-md">
+            Create structured, goal-driven events aligned with SDGs and community
+            needs.
+          </p>
         </div>
-      </div>
+
+        <div className="bg-white/5 border border-white/10 rounded-3xl p-8 space-y-4">
+          <Input label="Event Title" value={title} set={setTitle} />
+          <Input label="Location" value={location} set={setLocation} />
+          <Input label="Date" value={date} set={setDate} type="date" />
+          <Input
+            label="Volunteers Required"
+            value={vols}
+            set={setVols}
+            type="number"
+          />
+
+          <select
+            value={sdg}
+            onChange={(e) => setSdg(e.target.value)}
+            className="w-full bg-black border border-white/10 rounded-xl px-4 py-3"
+          >
+            <option>SDG 11 – Sustainable Cities</option>
+            <option>SDG 6 – Clean Water</option>
+            <option>SDG 4 – Quality Education</option>
+            <option>SDG 13 – Climate Action</option>
+          </select>
+
+          <button
+            onClick={createEvent}
+            className="w-full bg-[#00ADEF] text-black py-3 rounded-xl font-semibold"
+          >
+            Create Event
+          </button>
+        </div>
+      </section>
+
+      {/* ================= ACTIVITY LOG ================= */}
+      <section>
+        <h2 className="text-2xl font-semibold mb-6">
+          Activity Log
+        </h2>
+
+        {notifications.length === 0 && (
+          <p className="text-white/50">No activity yet.</p>
+        )}
+
+        <div className="space-y-3">
+          {notifications.map((n) => (
+            <div
+              key={n.id}
+              className="bg-[#0f172a] border border-white/10 rounded-xl p-4"
+            >
+              <p className="text-white">{n.text}</p>
+              <p className="text-xs text-white/50 mt-1">{n.date}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/* ---------------- UI PARTS ---------------- */
+
+function Stat({ label, value }: any) {
+  return (
+    <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+      <p className="text-white/60 text-sm">{label}</p>
+      <h2 className="text-3xl font-bold mt-1">{value}</h2>
+    </div>
+  );
+}
+
+function Input({ label, value, set, type = "text" }: any) {
+  return (
+    <div>
+      <label className="text-xs text-white/60">{label}</label>
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => set(type === "number" ? Number(e.target.value) : e.target.value)}
+        className="w-full mt-1 bg-black border border-white/10 rounded-xl px-4 py-3 text-white"
+      />
     </div>
   );
 }

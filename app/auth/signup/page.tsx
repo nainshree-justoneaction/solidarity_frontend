@@ -5,6 +5,7 @@ import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import toast from "react-hot-toast"
 import { signup } from "@/lib/api"
+import { Navbar } from "@/components/navbar"
 
 const roles = [
   { id: "student", label: "Student", desc: "Learn. Intern. Lead change.", color: "#E5243B" },
@@ -44,7 +45,6 @@ export default function SignupPage() {
         role,
       })
 
-      // ✅ STORE AUTH (THIS WAS MISSING)
       sessionStorage.setItem(
         "auth",
         JSON.stringify({
@@ -57,7 +57,6 @@ export default function SignupPage() {
 
       toast.success("Account created")
 
-      // ✅ THEN REDIRECT
       router.push(`/registration/${role}/step1`)
     } catch (err: any) {
       toast.error(err.message || "Signup failed")
@@ -70,8 +69,7 @@ export default function SignupPage() {
   return (
     <section className="min-h-screen bg-black text-white flex items-center justify-center px-6">
       <div className="w-full max-w-3xl">
-
-        {/* STATEMENT */}
+        <Navbar />
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -89,7 +87,6 @@ export default function SignupPage() {
           </p>
         </motion.div>
 
-        {/* ROLE SELECTION */}
         <div className="grid sm:grid-cols-2 gap-6 mb-16">
           {roles.map(r => (
             <button
@@ -114,7 +111,6 @@ export default function SignupPage() {
           ))}
         </div>
 
-        {/* FORM (APPEARS AFTER ROLE) */}
         {role && (
           <motion.form
             onSubmit={submit}

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 import { motion } from "framer-motion"
 import { HeroImageMarquee } from "@/components/hero/HeroMarquee"
-
+import Link from "next/link"
 
 export function HeroSection() {
   const [active, setActive] = useState(SDGS[0])
@@ -53,10 +53,9 @@ export function HeroSection() {
 
         <div className="mt-10 flex gap-4">
           <Button size="lg" className="bg-white text-black px-8">
-            Take Action
+            <Link href="/public/take-action">Take Action</Link>
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
-
           <Button
             size="lg"
             variant="outline"

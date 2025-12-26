@@ -1,41 +1,87 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
-import { Internship } from "./NGOInternshipsContext";
+import { createContext, useContext, useEffect, useState } from "react";
 
-export interface Student {
-  id: string;
-  name: string;
-  college: string;
-  skills: string[];
-}
+const NGOApplicantsContext = createContext<any>(null);
 
-export interface Applicant {
-  id: string;
-  internshipId: string;
-  student: Student;
-  status: "pending" | "selected" | "rejected";
-}
+export function NGOApplicantsProvider({ children }: any) {
+  const [applicants, setApplicants] = useState<any[]>([]);
 
-interface NGOApplicantsContextType {
-  applicants: Applicant[];
-  setApplicants: (apps: Applicant[]) => void;
-  updateApplicantStatus: (id: string, status: "pending" | "selected" | "rejected") => void;
-}
+  /* ================= DEMO SEED ================= */
+  useEffect(() => {
+    if (applicants.length > 0) return;
 
-const NGOApplicantsContext = createContext<NGOApplicantsContextType>({} as NGOApplicantsContextType);
+    const demo = [
+      {
+        id: "app-1",
+        internshipId: 1766738025625,
+        status: "selected",
+        student: {
+          id: "stu-1",
+          name: "Aarav Mehra",
+          college: "IIT Delhi",
+          skills: ["Python", "AI", "ML"],
+        },
+        progress: {
+          tasks: [
+            { title: "Orientation & onboarding", done: true },
+            { title: "Community survey", done: true },
+            { title: "Weekly report", done: false },
+          ],
+          logs: [
+            "Completed onboarding and NGO briefing",
+            "Visited field location and collected survey data",
+          ],
+          score: 72,
+        },
+      },
+      {
+        id: "app-2",
+        internshipId: 1766738025625,
+        status: "selected",
+        student: {
+          id: "stu-2",
+          name: "Riya Sharma",
+          college: "NSUT",
+          skills: ["UI/UX", "Figma", "Design"],
+        },
+        progress: {
+          tasks: [
+            { title: "Design audit", done: true },
+            { title: "Poster redesign", done: false },
+          ],
+          logs: ["Completed design audit for NGO website"],
+          score: 55,
+        },
+      },
+    ];
 
-export function NGOApplicantsProvider({ children }: { children: ReactNode }) {
-  const [applicants, setApplicants] = useState<Applicant[]>([]);
+    setApplicants(demo);
+  }, []);
 
-  function updateApplicantStatus(id: string, status: "pending" | "selected" | "rejected") {
+  /* ================= ACTIONS ================= */
+
+  function updateApplicantStatus(id: string, status: string) {
     setApplicants(prev =>
-      prev.map(a => a.id === id ? { ...a, status } : a)
+      prev.map(a => (a.id === id ? { ...a, status } : a))
+    );
+  }
+
+  function updateApplicantProgress(id: string, progress: any) {
+    setApplicants(prev =>
+      prev.map(a => (a.id === id ? { ...a, progress } : a))
     );
   }
 
   return (
-    <NGOApplicantsContext.Provider value={{ applicants, setApplicants, updateApplicantStatus }}>
+    <NGOApplicantsContext.Provider
+      value={{
+        applicants,
+        setApplicants,
+        updateApplicantStatus,
+        updateApplicantProgress,
+      }}
+    >
       {children}
     </NGOApplicantsContext.Provider>
   );

@@ -40,7 +40,7 @@ export function Navbar() {
           {/* BRAND */}
           <Link href="/" className="flex flex-col leading-tight">
             <motion.div whileHover={{ scale: 1.03 }} className="text-xl font-bold tracking-tight">
-              <span className="text-foreground">just </span>
+              <span className="text-foreground">Just </span>
               <span
                 className="bg-clip-text text-transparent"
                 style={{
@@ -48,7 +48,7 @@ export function Navbar() {
                     "linear-gradient(90deg, #E5243B, #FCC30B, #4C9F38, #26BDE2)",
                 }}
               >
-                one-xtion
+                OneAction
               </span>
             </motion.div>
             <span className="text-xs text-muted-foreground tracking-wide">
@@ -56,7 +56,6 @@ export function Navbar() {
             </span>
           </Link>
 
-          {/* DESKTOP MENU */}
           {/* DESKTOP MENU */}
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
@@ -75,8 +74,7 @@ export function Navbar() {
               <Link href="/auth/login">
                 <Button
                   size="sm"
-                  variant="outline"
-                  className="border-border text-foreground hover:bg-card"
+                  className="bg-foreground text-background hover:bg-foreground/90"
                 >
                   Log in
                 </Button>
@@ -87,7 +85,7 @@ export function Navbar() {
                   size="sm"
                   className="bg-foreground text-background hover:bg-foreground/90"
                 >
-                  Join Movement
+                  Let's Co-create
                 </Button>
               </Link>
             </div>

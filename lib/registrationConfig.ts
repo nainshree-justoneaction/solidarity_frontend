@@ -4,12 +4,12 @@ export const registrationSteps = {
   student: {
     step1: [
       { name: "fullName", label: "Full Name", type: "text", min: 3, required: true },
-      { name: "age", label: "Age", type: "number", min: 15, max: 40, required: true },
+      { name: "Date of Birth", label: "Age", type: "number", min: 15, max: 40, required: true },
       { name: "gender", label: "Gender", type: "radio", options: ["male", "female", "other"], required: true },
-      { name: "institute", label: "Institute / College", type: "text", min: 3, required: true },
       { name: "about", label: "Short Bio (About You)", type: "textarea", min: 10, required: true },
     ],
     step2: [
+      { name: "institute", label: "Institute / College", type: "text", min: 3, required: true },
       { name: "semester", label: "Semester", type: "text", min: 1, required: true },
       { name: "skills", label: "Skills / Competencies", type: "textarea", min: 5, required: true },
     ],
